@@ -165,55 +165,6 @@ body {
 }
 
 /* ============================================================
-   标题栏下方的「主体」圆角 —— 苹果风格"连续曲率"圆角(squircle)
-   为什么不用普通 border-radius:圆弧的曲率在两端是突变的,苹果那种是
-   连续曲率(超椭圆),看起来更饱满圆润。这里用 SVG 遮罩把缺口裁成
-   超椭圆形状,再用标题栏底色填充缺口 —— 圆角才是真正的"苹果味"。
-   参数:--corner-radius 半径;指数 n=4(越大越饱满,n=4 为经典 squircle)
-   兼容:不支持 mask 的老浏览器会退回普通圆弧(径向渐变那一层兜底)
-   ============================================================ */
-:root {
-  --corner-radius: 32px;
-}
-
-.container > header + * {
-  position: relative;
-  border-top-left-radius: var(--corner-radius);
-  border-top-right-radius: var(--corner-radius);
-}
-
-/* 缺口填色(径向渐变兜底)+ 遮罩裁形 */
-.container > header + *::before,
-.container > header + *::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  width: var(--corner-radius);
-  height: var(--corner-radius);
-  pointer-events: none;
-  -webkit-mask-repeat: no-repeat;
-          mask-repeat: no-repeat;
-  -webkit-mask-size: 100% 100%;
-          mask-size: 100% 100%;
-}
-
-.container > header + *::before {
-  left: 0;
-  background: radial-gradient(circle var(--corner-radius) at 100% 100%,
-              transparent var(--corner-radius), var(--header-bg) var(--corner-radius));
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M%200%200%20L%2032%200%20L32%200%20L23.82%200.03%20L20.44%200.14%20L17.87%200.31%20L15.72%200.55%20L13.86%200.86%20L12.2%201.24%20L10.72%201.69%20L9.37%202.22%20L8.15%202.82%20L7.03%203.5%20L6.02%204.25%20L5.09%205.09%20L4.25%206.02%20L3.5%207.03%20L2.82%208.15%20L2.22%209.37%20L1.69%2010.72%20L1.24%2012.2%20L0.86%2013.86%20L0.55%2015.72%20L0.31%2017.87%20L0.14%2020.44%20L0.03%2023.82%20L0%2032%20Z%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E");
-          mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M%200%200%20L%2032%200%20L32%200%20L23.82%200.03%20L20.44%200.14%20L17.87%200.31%20L15.72%200.55%20L13.86%200.86%20L12.2%201.24%20L10.72%201.69%20L9.37%202.22%20L8.15%202.82%20L7.03%203.5%20L6.02%204.25%20L5.09%205.09%20L4.25%206.02%20L3.5%207.03%20L2.82%208.15%20L2.22%209.37%20L1.69%2010.72%20L1.24%2012.2%20L0.86%2013.86%20L0.55%2015.72%20L0.31%2017.87%20L0.14%2020.44%20L0.03%2023.82%20L0%2032%20Z%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E");
-}
-
-.container > header + *::after {
-  right: 0;
-  background: radial-gradient(circle var(--corner-radius) at 0% 100%,
-              transparent var(--corner-radius), var(--header-bg) var(--corner-radius));
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M%2032%200%20L%200%200%20L0%200%20L8.18%200.03%20L11.56%200.14%20L14.13%200.31%20L16.28%200.55%20L18.14%200.86%20L19.8%201.24%20L21.28%201.69%20L22.63%202.22%20L23.85%202.82%20L24.97%203.5%20L25.98%204.25%20L26.91%205.09%20L27.75%206.02%20L28.5%207.03%20L29.18%208.15%20L29.78%209.37%20L30.31%2010.72%20L30.76%2012.2%20L31.14%2013.86%20L31.45%2015.72%20L31.69%2017.87%20L31.86%2020.44%20L31.97%2023.82%20L32%2032%20Z%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E");
-          mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M%2032%200%20L%200%200%20L0%200%20L8.18%200.03%20L11.56%200.14%20L14.13%200.31%20L16.28%200.55%20L18.14%200.86%20L19.8%201.24%20L21.28%201.69%20L22.63%202.22%20L23.85%202.82%20L24.97%203.5%20L25.98%204.25%20L26.91%205.09%20L27.75%206.02%20L28.5%207.03%20L29.18%208.15%20L29.78%209.37%20L30.31%2010.72%20L30.76%2012.2%20L31.14%2013.86%20L31.45%2015.72%20L31.69%2017.87%20L31.86%2020.44%20L31.97%2023.82%20L32%2032%20Z%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E");
-}
-
-/* ============================================================
    菜单栏底色:比主题默认(#fafafa)加深一点点
    注意:刻意比页脚(#eaeaea)浅一档,避免头尾撞色
    ============================================================ */
@@ -295,4 +246,93 @@ body {
 
 .logo {
   font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
+
+/* ===== 首页 hero:整页渐变 + 碰杯主体 ===== */
+@font-face {
+  font-family: 'Caveat';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/Caveat-500-latin.woff2') format('woff2');
+}
+
+/* 渐变铺满整页(菜单栏有自己的底色,盖在上面 → 天然「除菜单栏外」) */
+body.home {
+  background-color: #F7BC5C;
+  background-image: url('/img/hero-bg.svg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #2E2018;
+}
+
+/* 页脚在首页透明,让渐变一直铺到底(两种模式通用) */
+body.home .footer { background: transparent; }
+
+/* 浅色:暖黄底 + 深棕文字 */
+body.home h1 { color: #2E2018; }
+body.home .subtitle { color: rgba(46, 32, 24, .72); }
+body.home .footer__content,
+body.home .footer__content a { color: rgba(46, 32, 24, .72); }
+body.home .social-icons a,
+body.home .social-icons svg { color: #2E2018; fill: #2E2018; }
+
+/* 深色:紫色底 + 浅色文字 */
+[data-theme="dark"] body.home {
+  background-color: #473A7E;
+  background-image: url('/img/hero-bg-purple.svg');
+  color: #F4EFFF;
+}
+[data-theme="dark"] body.home h1 { color: #F7F3FF; }
+[data-theme="dark"] body.home .subtitle { color: rgba(244, 239, 255, .74); }
+[data-theme="dark"] body.home .footer__content,
+[data-theme="dark"] body.home .footer__content a { color: rgba(244, 239, 255, .74); }
+[data-theme="dark"] body.home .social-icons a,
+[data-theme="dark"] body.home .social-icons svg { color: #F4EFFF; fill: #F4EFFF; }
+[data-theme="dark"] .hero__handle { color: #F7F3FF; }
+
+/* 主体 */
+.hero {
+  width: 430px;
+  max-width: 80vw;
+  margin: 0 auto 18px;
+}
+.hero__art,
+.hero__art > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hero__handle {
+  text-align: center;
+  font-family: 'Caveat', cursive;
+  font-weight: 500;
+  font-size: 2.7em;
+  line-height: 1;
+  color: #2E2018;
+  transform: rotate(-2.5deg);
+}
+
+@media (max-width: 600px) {
+  .hero { width: 300px; max-width: 78vw; }
+  .hero__handle { font-size: 2.1em; }
+}
+
+/* ============================================================
+   首页专用:菜单栏与整页渐变同色
+   浅色模式 → 菜单栏透明,直接透出同一张渐变底(顶部最亮那部分)
+   深色模式 → 同样透明(两种模式显示方式一致)
+   ============================================================ */
+body.home .header {
+  background: transparent;
+}
+
+/* 深色模式:与浅色同一套显示方式 —— 菜单栏同样透明,直接融进紫渐变
+   (--header-bg 仍保留深紫值,给手机端展开菜单的浮层用,保证不透明可读) */
+[data-theme=dark] body.home {
+  --header-bg: #2C2158;
+}
+[data-theme=dark] body.home .header {
+  background: transparent;
 }

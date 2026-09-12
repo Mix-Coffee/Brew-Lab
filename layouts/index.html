@@ -1,0 +1,27 @@
+{{ define "body" }}
+    <body class="home">
+{{ end }}
+
+{{ define "main" }}
+    <div class="content-center">
+        <main>
+            <div>
+                <div class="hero">
+                    {{/* 内联 SVG(而非 <img>):避免浏览器在图片上挂"视觉搜索"按钮,同时省一次请求 */}}
+                    <div class="hero__art">{{ readFile "static/img/hero-art.svg" | safeHTML }}</div>
+                    <div class="hero__handle">@Mix-Coffee</div>
+                </div>
+
+                <h1>{{ .Site.Params.homeTitle | default .Site.Title }}</h1>
+
+                {{ partial "subtitle.html" . }}
+
+                {{- with .Site.Params.social }}
+                    <div>
+                        {{ partial "social-icons.html" . }}
+                    </div>
+                {{- end }}
+            </div>
+        </main>
+    </div>
+{{ end }}
