@@ -69,6 +69,9 @@ disableHugoGeneratorInject = false
 
   # Metadata mostly used in document's head
   # 
+  # 分享时的链接预览描述(og:description)。与首页副标题 homeSubtitle 保持一致,
+  # 改一处记得改另一处。
+  description = "Lab notes & builds, all brewed here."
   keywords = ""
   images = [""]
 
