@@ -69,7 +69,6 @@ disableHugoGeneratorInject = false
 
   # Metadata mostly used in document's head
   # 
-  description = "Brew-Lab —— NAS、网络与 AI 的折腾笔记"
   keywords = ""
   images = [""]
 
