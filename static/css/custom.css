@@ -1,0 +1,298 @@
+/* ============================================================
+   自定义样式:顶部菜单栏撑满整页宽度
+   作用:覆盖主题 .header__inner 固定 760px 宽度的限制,
+        让左侧 logo 贴页面左边缘、右侧菜单贴页面右边缘
+   ============================================================ */
+
+/* 外层 header:左右留出边距(数值可调,想要更贴边就调小) */
+.header {
+  padding: 20px 32px;
+}
+
+/* 关键:去掉固定 760px,改为撑满父容器 */
+.header__inner {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 菜单整体靠右对齐 */
+.menu__inner {
+  justify-content: flex-end;
+  padding: 0;
+}
+
+/* 菜单项间距稍微加大,观感更舒展(可选) */
+.menu__inner li {
+  margin: 0 16px;
+}
+
+/* 手机端保持紧凑,避免挤到换行 */
+@media (max-width: 684px) {
+  .header {
+    padding: 16px 16px;
+  }
+  .menu__inner li {
+    margin: 0;
+  }
+}
+
+/* 去掉链接自带的右边距:保证菜单右边缘与 logo 左边缘留白完全对称 */
+.menu__inner a {
+  margin-right: 0;
+}
+
+/* ============================================================
+   页脚:合并为一行 + 缩小字号
+   主题原本是两个 .footer__inner 区块(各占一行);
+   这里把外层改成 flex 让两块并排,并整体缩小字号
+   ============================================================ */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 0.75em;          /* 两块之间的间隔 */
+  font-size: 0.8rem;      /* 字号:1rem → 0.8rem(想要更小可改 0.75rem) */
+}
+
+/* 去掉固定 760px 宽度,让两块内容能并排 */
+.footer__inner {
+  width: auto;
+  max-width: 100%;
+  margin: 0;
+}
+
+/* 内容字号跟随 .footer */
+.footer__content {
+  font-size: inherit;
+}
+
+/* 顶部那块内部条目之间也稍微收紧 */
+.footer__content > *:not(:last-child)::after {
+  padding: 0 4px;
+}
+
+/* ============================================================
+   页脚:窄屏(手机/平板)也保持单行
+   主题在 <=900px 时把 .footer__content 改成竖排并隐藏分隔符,
+   这里覆盖回横排,并整体缩小字号,保证一行放得下
+   ============================================================ */
+@media (max-width: 900px) {
+  .footer {
+    font-size: 0.72rem;      /* 手机上再小一点,确保一行放得下 */
+    gap: 0 0.5em;
+  }
+  .footer__content {
+    flex-direction: row;     /* 覆盖主题的 column */
+    margin-top: 0;           /* 覆盖主题的 10px 上边距 */
+    gap: 0 0.5em;            /* 条目之间留一点空隙 */
+  }
+  /* 主题在窄屏把分隔符 content 清空了,这里用 gap 代替即可 */
+  .footer__content > *:not(:last-child)::after {
+    content: "";
+    padding: 0;
+  }
+}
+
+/* 更窄的手机(<=420px):再缩小字号与间距,保证仍是一行 */
+@media (max-width: 420px) {
+  .footer {
+    font-size: 0.62rem;
+    gap: 0 0.3em;
+  }
+  .footer__content {
+    gap: 0 0.3em;
+  }
+  .footer__content svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+/* ============================================================
+   顶栏 logo:把 🍺(logo__mark)排到文字与闪动光标之后
+   .logo 本身是 flex,直接用 order 调整顺序即可
+   最终呈现:> $ cd /home/Brew-Lab █ 🍺
+   ============================================================ */
+.logo__text   { order: 0; }
+.logo__cursor { order: 1; }   /* 光标紧跟文字 */
+.logo__mark   {
+  order: 2;                   /* 🍺 放到光标之后 */
+  margin-right: 0;            /* 主题原本是 margin-right: 5px(在左侧用) */
+  margin-left: 5px;           /* 移到右侧后改成左边距 */
+}
+
+/* ============================================================
+   字体:Inter → Figtree
+   1) 分字重静态文件 400/600/700/800 + 400 斜体,共 5 个约 56KB
+      (不要改用"可变字体"单文件:浏览器实测只按 Light 渲染,标题会变细)
+   2) 覆盖主题 body 上的字体栈(主题在 _main.scss 里写死 Inter)
+   注意:顶栏 logo 的 monospace 与代码块的 Consolas 保持不变
+   ============================================================ */
+@font-face { font-family:'Figtree'; font-style:normal; font-weight:400; font-display:swap; src:url('/fonts/Figtree-400-latin.woff2') format('woff2'); }
+@font-face { font-family:'Figtree'; font-style:normal; font-weight:600; font-display:swap; src:url('/fonts/Figtree-600-latin.woff2') format('woff2'); }
+@font-face { font-family:'Figtree'; font-style:normal; font-weight:700; font-display:swap; src:url('/fonts/Figtree-700-latin.woff2') format('woff2'); }
+@font-face { font-family:'Figtree'; font-style:normal; font-weight:800; font-display:swap; src:url('/fonts/Figtree-800-latin.woff2') format('woff2'); }
+@font-face { font-family:'Figtree'; font-style:italic; font-weight:400; font-display:swap; src:url('/fonts/Figtree-400-Italic-latin.woff2') format('woff2'); }
+body {
+  /* 注意:字体栈里不要再保留 Inter —— Figtree 没有的字符(如 🍺、中文)
+     会触发浏览器去下载主题自带的 Inter-Regular.woff2(96.8KB),
+     而它其实也没有这些字形,纯属浪费流量。直接交给系统字体回退即可。 */
+  font-family: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    Helvetica, Arial, sans-serif;
+}
+
+/* ============================================================
+   页脚:底色比正文深一档(不加分割线,只用底色区分,靠对比度划分)
+   颜色取自主题调色板 _variables.scss:
+     浅色 $light-background-secondary #eaeaea
+     深色 $dark-background-header     #1b1c1d(与顶部菜单栏同色,首尾呼应)
+   明暗切换方式与主题保持一致:[data-theme] + prefers-color-scheme 双保险
+   ============================================================ */
+.footer {
+  background-color: #f7f7f7;     /* 浅色(再浅一档,与页面白底差别更小) */
+}
+@media (prefers-color-scheme: dark) {
+  .footer {
+    background-color: #1b1c1d;   /* 深色:与顶部菜单栏同色 */
+  }
+}
+[data-theme=dark] .footer {
+  background-color: #1b1c1d;
+}
+[data-theme=light] .footer {
+  background-color: #f7f7f7;
+}
+
+/* ============================================================
+   标题栏下方的「主体」圆角 —— 苹果风格"连续曲率"圆角(squircle)
+   为什么不用普通 border-radius:圆弧的曲率在两端是突变的,苹果那种是
+   连续曲率(超椭圆),看起来更饱满圆润。这里用 SVG 遮罩把缺口裁成
+   超椭圆形状,再用标题栏底色填充缺口 —— 圆角才是真正的"苹果味"。
+   参数:--corner-radius 半径;指数 n=4(越大越饱满,n=4 为经典 squircle)
+   兼容:不支持 mask 的老浏览器会退回普通圆弧(径向渐变那一层兜底)
+   ============================================================ */
+:root {
+  --corner-radius: 32px;
+}
+
+.container > header + * {
+  position: relative;
+  border-top-left-radius: var(--corner-radius);
+  border-top-right-radius: var(--corner-radius);
+}
+
+/* 缺口填色(径向渐变兜底)+ 遮罩裁形 */
+.container > header + *::before,
+.container > header + *::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: var(--corner-radius);
+  height: var(--corner-radius);
+  pointer-events: none;
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+          mask-size: 100% 100%;
+}
+
+.container > header + *::before {
+  left: 0;
+  background: radial-gradient(circle var(--corner-radius) at 100% 100%,
+              transparent var(--corner-radius), var(--header-bg) var(--corner-radius));
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M%200%200%20L%2032%200%20L32%200%20L23.82%200.03%20L20.44%200.14%20L17.87%200.31%20L15.72%200.55%20L13.86%200.86%20L12.2%201.24%20L10.72%201.69%20L9.37%202.22%20L8.15%202.82%20L7.03%203.5%20L6.02%204.25%20L5.09%205.09%20L4.25%206.02%20L3.5%207.03%20L2.82%208.15%20L2.22%209.37%20L1.69%2010.72%20L1.24%2012.2%20L0.86%2013.86%20L0.55%2015.72%20L0.31%2017.87%20L0.14%2020.44%20L0.03%2023.82%20L0%2032%20Z%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M%200%200%20L%2032%200%20L32%200%20L23.82%200.03%20L20.44%200.14%20L17.87%200.31%20L15.72%200.55%20L13.86%200.86%20L12.2%201.24%20L10.72%201.69%20L9.37%202.22%20L8.15%202.82%20L7.03%203.5%20L6.02%204.25%20L5.09%205.09%20L4.25%206.02%20L3.5%207.03%20L2.82%208.15%20L2.22%209.37%20L1.69%2010.72%20L1.24%2012.2%20L0.86%2013.86%20L0.55%2015.72%20L0.31%2017.87%20L0.14%2020.44%20L0.03%2023.82%20L0%2032%20Z%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E");
+}
+
+.container > header + *::after {
+  right: 0;
+  background: radial-gradient(circle var(--corner-radius) at 0% 100%,
+              transparent var(--corner-radius), var(--header-bg) var(--corner-radius));
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M%2032%200%20L%200%200%20L0%200%20L8.18%200.03%20L11.56%200.14%20L14.13%200.31%20L16.28%200.55%20L18.14%200.86%20L19.8%201.24%20L21.28%201.69%20L22.63%202.22%20L23.85%202.82%20L24.97%203.5%20L25.98%204.25%20L26.91%205.09%20L27.75%206.02%20L28.5%207.03%20L29.18%208.15%20L29.78%209.37%20L30.31%2010.72%20L30.76%2012.2%20L31.14%2013.86%20L31.45%2015.72%20L31.69%2017.87%20L31.86%2020.44%20L31.97%2023.82%20L32%2032%20Z%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E");
+          mask-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Cpath%20d%3D%27M%2032%200%20L%200%200%20L0%200%20L8.18%200.03%20L11.56%200.14%20L14.13%200.31%20L16.28%200.55%20L18.14%200.86%20L19.8%201.24%20L21.28%201.69%20L22.63%202.22%20L23.85%202.82%20L24.97%203.5%20L25.98%204.25%20L26.91%205.09%20L27.75%206.02%20L28.5%207.03%20L29.18%208.15%20L29.78%209.37%20L30.31%2010.72%20L30.76%2012.2%20L31.14%2013.86%20L31.45%2015.72%20L31.69%2017.87%20L31.86%2020.44%20L31.97%2023.82%20L32%2032%20Z%27%20fill%3D%27white%27%2F%3E%3C%2Fsvg%3E");
+}
+
+/* ============================================================
+   菜单栏底色:比主题默认(#fafafa)加深一点点
+   注意:刻意比页脚(#eaeaea)浅一档,避免头尾撞色
+   ============================================================ */
+:root { --header-bg: #e0e0e0; }                       /* 浅色(逐步加深) */
+@media (prefers-color-scheme: dark) {
+  :root { --header-bg: #1b1c1d; }                       /* 跟随系统深色 */
+}
+[data-theme=dark]  { --header-bg: #1b1c1d; }
+[data-theme=light] { --header-bg: #e0e0e0; }
+
+.header { background: var(--header-bg); }
+/* 主题里 [data-theme=light] .header 的优先级更高,必须同样带属性选择器才能覆盖 */
+[data-theme=dark]  .header { background: var(--header-bg); }
+[data-theme=light] .header { background: var(--header-bg); }
+@media (prefers-color-scheme: dark) {
+  .header { background: var(--header-bg); }
+}
+
+/* ============================================================
+   修复:菜单区出现"方块"
+   主题给 .menu / .submenu 也铺了一层旧标题栏底色(#fafafa),
+   而我们把标题栏改成了 --header-bg(#f2f2f2)→ 菜单区就显示成
+   一块颜色略浅的方块。这里让它们跟随新底色:
+     桌面端:菜单就嵌在标题栏里 → 直接透明,最干净
+     手机端:菜单是下拉浮层 → 需要不透明,用标题栏同色
+   ============================================================ */
+.header .menu,
+.header .submenu {
+  background: var(--header-bg);
+}
+@media (min-width: 685px) {
+  .header .menu,
+  .header .submenu {
+    background: transparent;
+  }
+}
+/* 下拉面板也跟标题栏同色,保持一致 */
+.header .submenu .dropdown-content {
+  background: var(--header-bg);
+}
+
+/* 页脚:压扁高度(原来上下留白 28px,现在 14px) */
+.footer {
+  padding: 14px 20px;
+}
+@media (max-width: 900px) {
+  .footer {
+    padding: 12px 12px;
+  }
+}
+@media (max-width: 420px) {
+  .footer {
+    padding: 10px 8px;
+  }
+}
+
+/* ============================================================
+   顶栏 logo 字体:显式指定,不再依赖浏览器"默认等宽字体"
+   原因:主题写的是 font-family: monospace(泛型字体),具体用哪个由系统决定 ——
+     你在 Windows Edge 上解析成 Courier New(打字机感、偏细偏旧),
+     Linux 上则是 DejaVu Sans Mono,每台机器都不一样。
+   现在自托管 JetBrains Mono:所有设备渲染一致,也是常见的终端/代码字体。
+   (不依赖系统字体,离线也能正确显示)
+   ============================================================ */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-700.woff2') format('woff2');
+}
+
+.logo {
+  font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}

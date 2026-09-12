@@ -1,12 +1,16 @@
 baseURL = "https://brewlab-studio.pages.dev"
-title   = "Hello! here is Brew-Lab"
-languageCode = "zh-CN"
+title   = "Brew-Lab"
+locale = "zh-CN"
+
+# 单语言站点,但需显式声明默认语言,否则 <html lang="en"> 会把中文页标成英语
+# (影响搜索引擎语言判定与读屏软件发音)
+defaultContentLanguage = "zh-cn"   # 语言名必须全小写,否则 Hugo 拒绝启动
 theme = "hello-friend-ng"
 
 PygmentsCodeFences = true
 PygmentsStyle = "monokai"
 
-copyright = "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License." # This message is only used by the RSS template.
+copyright = '<a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
 
 archetypeDir = "archetypes"
 contentDir   = "content"
@@ -17,7 +21,7 @@ publishDir   = "public"
 buildDrafts  = false
 buildFuture  = false
 buildExpired = false
-canonifyURLs = true
+canonifyURLs = false
 
 enableRobotsTXT = true
 enableGitInfo   = false
@@ -55,6 +59,9 @@ disableHugoGeneratorInject = false
   series   = "series"
 
 [params]
+  # 手机浏览器地址栏配色 = 顶栏闪动光标同色(主题 _logo.scss 的 #fe5186)
+  themeColor      = "#fe5186"
+
   dateform        = "Jan 2, 2006"
   dateformShort   = "Jan 2"
   dateformNum     = "2006-01-02"
@@ -62,7 +69,7 @@ disableHugoGeneratorInject = false
 
   # Metadata mostly used in document's head
   # 
-  description = "Nice theme for homepages and blogs"
+  description = "Brew-Lab —— NAS、网络与 AI 的折腾笔记"
   keywords = ""
   images = [""]
 
@@ -87,7 +94,7 @@ disableHugoGeneratorInject = false
   # Per default, this option is off. 
   # The theme is respecting the prefers-color-scheme of the operating system. 
   # With this option on, the page user is able to set the scheme he wants. 
-  enableThemeToggle = false
+  enableThemeToggle = true
 
   # Sharing buttons
   #
@@ -102,17 +109,10 @@ disableHugoGeneratorInject = false
   # This option enables reading time part on post info
   #
   enableReadingTime = true
-
-  # Global language menu
-  #
-  # Enables the global language menu.
-  #
-  enableGlobalLanguageMenu = true
-
   # Integrate Javascript files or stylesheets by adding the url to the external assets or by
   # linking local files with their path relative to the static folder, e.g. "css/styles.css"
   #
-  customCSS = []
+  customCSS = ["/css/custom.css"]
   customJS  = []
 
   # Integrate Plausible.io
@@ -138,14 +138,17 @@ disableHugoGeneratorInject = false
 
   # Colors for favicons
   #
-  [params.favicon.color]
+  # 注意:主题模板实际读取的是 favicon.mask / favicon.msapplication,
+  # 原来写在 favicon.color 下面 → 这两个属性一直渲染为 color="",
+  # 现已按主题的真实读取路径修正。
+  #
+  [params.favicon]
     mask = "#1b1c1d"
     msapplication = "#1b1c1d"
-    theme = "#1b1c1d"
 
   [params.logo]
-    logoMark     = ">"
-    logoText     = "$ cd /home/Brew-Lab"
+    logoMark     = "🍺"
+    logoText     = "> $ cd /home/Brew-Lab"
     logoHomeLink = "/"
     # Set true to remove the logo cursor entirely.
     # logoCursorDisabled = false
@@ -236,22 +239,10 @@ disableHugoGeneratorInject = false
     name = "github"
     url  = "https://github.com/Mix-Coffee"
 
-[languages]
-  [languages.en]
-    weight    = 1
-    copyright = '<a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
-  [languages.en.params]
-    subtitle  = "Hello Friend NG Theme"
-
-  [languages.fr]
-    weight    = 2
-    copyright = '<a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
-  [languages.fr.params]
-    subtitle  = "Hello Friend NG Theme"
-
 [menu]
   [[menu.main]]
-    identifier  = "about"
+    identifier  = "2-about"
+    weight      = 2
     name        = "关于"
     url         = "about/"
     hasChildren = true
@@ -260,9 +251,10 @@ disableHugoGeneratorInject = false
     identifier  = "me"
     name        = "Blogger"
     url         = "about/me/"
-    parent      = "about"
+    parent      = "2-about"
 
   [[menu.main]]
-    identifier = "posts"
+    identifier = "1-posts"
+    weight     = 1
     name       = "博客"
     url        = "posts/"
