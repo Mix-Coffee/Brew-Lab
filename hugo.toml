@@ -77,6 +77,8 @@ disableHugoGeneratorInject = false
 
   # Home subtitle of the index page.
   #
+  # 首页大标题(留空则用站点 title)
+  homeTitle = "Hello! here is Brew-Lab"
   homeSubtitle = "Lab notes & builds, all brewed here."
 
   # Set a background for the homepage
@@ -242,6 +244,12 @@ disableHugoGeneratorInject = false
     url  = "https://github.com/Mix-Coffee"
 
 [menu]
+  # Cheese-Lib:先占位(weight 0 → 排在"博客"前面)
+  [[menu.main]]
+    identifier = "0-cheese-lib"
+    weight     = 0
+    name       = "Cheese-Lib"
+    url        = "cheese-lib/"
   [[menu.main]]
     identifier  = "2-about"
     weight      = 2
@@ -258,5 +266,5 @@ disableHugoGeneratorInject = false
   [[menu.main]]
     identifier = "1-posts"
     weight     = 1
-    name       = "博客"
+    name       = "Posts"
     url        = "posts/"
