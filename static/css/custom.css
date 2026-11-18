@@ -608,6 +608,24 @@ main a[href*="mailto:"]:hover svg      { color: #F2F2F2; }   /* 浅色模式:白
 main a[href*="github.com"]:hover svg   { color: #6E5494; }   /* GitHub 紫 */
 
 /* ============================================================
+   交互反馈
+   · 手机端点击元素会有一块系统蓝色高亮(tap highlight),关掉
+   · 鼠标点击不再显示焦点方框,只有键盘 Tab 导航时才显示(保留可访问性)
+   ============================================================ */
+* { -webkit-tap-highlight-color: transparent; }
+
+:focus { outline: none; }
+/* 键盘导航才出现的焦点提示,用本站的暖棕而不是浏览器默认蓝 */
+:focus-visible {
+  outline: 2px solid rgba(46, 32, 24, .35);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+[data-theme="dark"] :focus-visible {
+  outline-color: rgba(244, 239, 255, .45);
+}
+
+/* ============================================================
    首页 / 顶栏 —— 分设备参数(唯一入口)
    桌面与手机各一套,互不影响:改手机只动「手机」那段,改电脑只动「桌面」那段。
    分段点 685px,与主题断点一致。
@@ -655,7 +673,7 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
   body.home .footer { padding-bottom: 8px; }
 
   .header { padding: 20px 32px; }
-  .logo__text { font-size: 18px; letter-spacing: 0; }
+  .logo__text { font-size: 20px; letter-spacing: 0.8px; }   /* 左上角 logo:字号 20px,字距 0.8px */
   .header .logo__mark svg { height: 22px; vertical-align: -4px; }
   .header__right .theme-toggle, .header__right .menu-trigger { width: 24px; height: 24px; }
   .header__right .theme-toggle svg, .header__right .menu-trigger svg { width: 24px; height: 24px; }
@@ -670,7 +688,8 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
   body.home .content-center { padding-top: max(60px, calc(42vh - var(--hero-art-h) / 2 - 40px)); }
   body.home .footer { padding-bottom: 6px; }
 
-  /* 顶栏 logo 不动了 —— 之前误改,已全部还原成主题默认(18px 文字 / 22px 图案 / 24px 图标) */
+  /* 顶栏 logo 保持主题默认字号(18px / 22px 图案 / 24px 图标),只收紧字距 */
+  .logo__text { font-size: 16px; letter-spacing: 0.2px; }   /* 字号 18 → 16;字距收自主题的 0.96px */
   /* @Mix-Coffee 收到 30px(2.55em → 1.875em):让顶栏 logo(文字 21px / 图案 34px)在二者之间更大 */
   .hero__handle { font-size: 1.875em; }
 }
