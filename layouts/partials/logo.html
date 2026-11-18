@@ -1,0 +1,15 @@
+<a href="{{ if .Site.Params.Logo.LogoHomeLink }}{{ .Site.Params.Logo.LogoHomeLink }}{{ else }}{{ .Site.BaseURL | relLangURL }}{{ end }}" style="text-decoration: none;">
+    <div class="logo">
+        {{/* 站点覆盖版:把主题的 logoMark(字符 emoji,由访客设备渲染、各平台长相不同)
+             换成 Google Noto 的单杯矢量图 —— 所有设备看到的是同一个杯子。
+             原始字符仍保留在 hugo.toml 的 [params.logo] logoMark 里,想还原只需删掉本文件。 */}}
+        <span class="logo__mark">{{ readFile "static/img/icon-mug.svg" | safeHTML }}</span>
+        <span class="logo__text {{ with.Site.Params.Logo.logoCursorPathname}}logo__pathname{{ end }}">
+            {{ with .Site.Params.Logo.logoText }}{{ . }}{{ else }}hello{{ end }}</span>
+        <span class="logo__cursor" style=
+              "{{ with.Site.Params.Logo.logoCursorDisabled }}visibility:hidden;{{ end }}
+               {{ with .Site.Params.Logo.logoCursorColor    }}background-color:{{ . }};{{ end }}
+               {{ with.Site.Params.Logo.logoCursorAnimate  }}animation-duration:{{ . }};{{ end }}">
+        </span>
+    </div>
+</a>

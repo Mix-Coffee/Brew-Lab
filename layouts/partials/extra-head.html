@@ -2,3 +2,339 @@
 {{/* 预加载常用字重,避免首屏先用备用字体再切换(消除"变细"闪烁) */}}
 <link rel="preload" href="/fonts/Figtree-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/Figtree-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+
+{{/* 深/浅切换:拦截主题的"整页刷新"式切换,改成以图标为中心的圆形扩散动画
+     · 主题的 switchTheme() 最后会 window.location.reload(),动画会被刷掉,所以必须拦下来自己做
+     · 监听挂在 .header__right 的**捕获阶段** —— 比绑定在按钮自身(冒泡)的主题处理器先跑,
+       stopPropagation() 就能拦住它(在同一元素上注册,后注册的反而吞不掉先注册的) */}}
+<script>
+(function () {
+  var KEY = 'theme';
+  function apply(mode) {
+    document.documentElement.setAttribute('data-theme', mode);
+    try { localStorage.setItem(KEY, mode); } catch (e) {}
+  }
+  function current() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var host = document.querySelector('.header__right');
+    if (!host) return;
+    host.addEventListener('click', function (e) {
+      var btn = e.target && e.target.closest ? e.target.closest('.theme-toggle') : null;
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();                       // 拦住主题那个会 reload 的处理器
+      var next = current() === 'dark' ? 'light' : 'dark';
+      var r = btn.getBoundingClientRect();
+      var cx = r.left + r.width / 2, cy = r.top + r.height / 2;   // 以图标中心为圆心
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!document.startViewTransition || reduce) { apply(next); return; }
+      var radius = Math.hypot(Math.max(cx, window.innerWidth - cx),
+                             Math.max(cy, window.innerHeight - cy)) + 24;
+      var root = document.documentElement.style;
+      root.setProperty('--tt-x', cx + 'px');
+      root.setProperty('--tt-y', cy + 'px');
+      root.setProperty('--tt-r', radius + 'px');
+      document.startViewTransition(function () { apply(next); });
+    }, true);
+  });
+})();
+</script>
+
+{{/* 桌面端也用汉堡菜单:主题按断点给 .menu-trigger 加 .hidden(宽屏隐藏汉堡),
+     这里移除并置 html.js-menu-ready —— 菜单卡片的显示由该 class 放行(避免首屏闪一下) */}}
+<script>
+(function () {
+  var collapsed = false;
+  function ready() {
+    var trigger = document.querySelector('.menu-trigger');
+    if (trigger) trigger.classList.remove('hidden');        // 宽屏也要显示汉堡
+    var menu = document.querySelector('nav.menu');
+    if (menu && !collapsed) menu.classList.add('hidden');   // 初始收起 —— 主题的汉堡点击负责切换
+    collapsed = true;
+    document.documentElement.classList.add('js-menu-ready');
+  }
+  // 二级菜单(关于 → Blogger / Blogroll):主题只有 CSS 的 :hover,
+  // 触屏上没有 hover,必须自己接管点击 —— 否则手机端点「关于」毫无反应。
+  function initDropdown() {
+    var menu = document.querySelector('nav.menu');
+    if (!menu || menu.dataset.dropdownReady) return;
+    menu.dataset.dropdownReady = '1';
+    menu.addEventListener('click', function (e) {
+      var btn = e.target && e.target.closest ? e.target.closest('a.dropbtn') : null;
+      if (!btn) return;
+      e.preventDefault();
+      var li = btn.parentNode;
+      while (li && li.tagName !== 'LI') li = li.parentNode;
+      if (!li) return;
+      var wasOpen = li.classList.contains('open');
+      closeAll();
+      if (!wasOpen) li.classList.add('open');
+    });
+    document.addEventListener('click', function (e) {
+      if (menu.contains(e.target)) return;
+      closeAll();
+    });
+    function closeAll() {
+      var opened = menu.querySelectorAll('li.dropdown.open');
+      for (var i = 0; i < opened.length; i++) opened[i].classList.remove('open');
+    }
+  }
+  function boot() { ready(); initDropdown(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+  // 主题在 resize 时会按断点重置,延迟一拍盖回去
+  window.addEventListener('resize', function () { setTimeout(ready, 60); });
+})();
+</script>
+
+{{/* 首页底部白卡(B 方案):固定底部,滚动驱动升幅,内容从下方滑进去。
+     · 把卡片移到页脚之后(模板里它只能放在 main 块,而 © 要浮在卡片上沿)
+     · --card-p(滚动进度)与 --card-drag(提手拖拽)叠加驱动卡片升幅;--card-d 与总露出 1:1 同步
+     · centerContent:把「logo → 信息」整块在「顶栏底部」与「© 那行顶部」之间垂直居中 */}}
+<script>
+(function () {
+  function ready() {
+    var card = document.getElementById('bottomCard');
+    if (!card) return;
+
+    var footer = document.querySelector('.footer');
+    if (footer && footer.parentNode) footer.parentNode.insertBefore(card, footer.nextSibling);
+
+    // Liquid Glass 折射滤镜定义(SVG)。
+    // 放在这里而不是模板里:它是一个纯装饰性定义,没有它页面照常工作,
+    // 而且用 JS 注入可以保证在卡片渲染前就位。Chromium 才会真正用到它。
+    (function () {
+      if (document.getElementById('lg-defs')) return;
+      var NS = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('id', 'lg-defs');
+      svg.setAttribute('width', '0');
+      svg.setAttribute('height', '0');
+      svg.setAttribute('aria-hidden', 'true');
+      svg.setAttribute('focusable', 'false');
+      svg.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;overflow:hidden;pointer-events:none';
+      var f = document.createElementNS(NS, 'filter');
+      f.setAttribute('id', 'liquid-glass');
+      f.setAttribute('x', '-25%'); f.setAttribute('y', '-25%');
+      f.setAttribute('width', '150%'); f.setAttribute('height', '150%');
+      f.setAttribute('color-interpolation-filters', 'sRGB');
+      f.innerHTML = '<feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="2" seed="9" result="n"/>'
+                  + '<feGaussianBlur in="n" stdDeviation="3" result="sn"/>'
+                  + '<feDisplacementMap in="SourceGraphic" in2="sn" scale="16" xChannelSelector="R" yChannelSelector="G"/>';
+      svg.appendChild(f);
+      (document.body || document.documentElement).appendChild(svg);
+    })();
+
+    var root = document.documentElement, ticking = false;
+    var dragNow = 0;                       // 提手拖拽带来的额外位移(px),与滚动进度叠加
+    function isMobile() { return window.matchMedia('(max-width: 684px)').matches; }
+    // 几何量缓存:读取 scrollHeight / getComputedStyle 会强制同步布局与样式重算,
+    // 放在每帧的热路径里(Safari 尤其明显)会让拖拽严重掉帧。
+    // 只在初始化与 resize 时量一次。
+    var _travel = 0, _maxScroll = 1;
+    function measure() {
+      _travel = card.offsetHeight + (parseFloat(getComputedStyle(root).getPropertyValue('--card-drop')) || 0);
+      _maxScroll = Math.max(1, root.scrollHeight - (window.innerHeight || 800));
+    }
+    function travelPx() { return _travel; }
+    function pNow() {                      // 页面滚动进度(纯算术,零布局读取)
+      return Math.max(0, Math.min(1, window.scrollY / _maxScroll));
+    }
+    function syncDepth() {                 // 景深 = 卡片「总露出」进度(滚动 + 拖拽),1:1 同步
+      var t = travelPx() || 1;
+      var d = Math.min(1, (pNow() * t + dragNow) / t);
+      root.style.setProperty('--card-d', d.toFixed(3));
+      // 量化到 8 档再喂给 filter:拖动时只重算 8 次整屏模糊,而不是每帧
+      root.style.setProperty('--card-dq', (Math.round(d * 8) / 8).toFixed(3));
+    }
+
+    function update() {
+      ticking = false;
+      root.style.setProperty('--card-p', pNow().toFixed(3));
+      syncDepth();
+    }
+    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // 「logo → 信息」这块的 top 只量一次就冻结。
+    // 原因:居中要参考「© 那行」的位置,而 © 是跟着卡片上下走的 ——
+    // 每次重算都会因为卡片动了而算出不同的值,内容就会一直跳。
+    // 现在只在「宽度变化」(转屏等)时重新量;高度变化多为手机地址栏收放,一律不动。
+    var frozenTop = null, frozenW = -1;
+    function centerContent(force) {
+      var box = document.querySelector('.content-center');
+      var header = document.querySelector('.header');
+      var copy = null;
+      var spans = document.querySelectorAll('.footer span');
+      for (var i = 0; i < spans.length; i++) {
+        if (spans[i].textContent.indexOf(String.fromCharCode(169)) >= 0) { copy = spans[i]; break; }
+      }
+      if (!box || !header || !copy) return;
+      var w = window.innerWidth;
+      if (!force && frozenTop !== null && w === frozenW) return;   // 量过了就不动
+      // 内容块现在是 fixed(不随页面滚),居中直接写它的 top
+      var inner = box.querySelector('main > div') || box;
+      inner.style.top = '0px';
+      var top = header.getBoundingClientRect().bottom;
+      // © 的位置必须按「卡片静止时」算,不能读它当前的位置 ——
+      // 卡片升起来时 © 会跟着上移,拿它算出来的值每次都不同,内容就会跳。
+      // 静止时 © 距视口底 = --card-gap − --card-drop + 12(与 CSS 里页脚的公式一致)。
+      var cs = getComputedStyle(root);
+      var gap = parseFloat(cs.getPropertyValue('--card-gap')) || 34;
+      var drop = parseFloat(cs.getPropertyValue('--card-drop')) || 4;
+      var bottom = window.innerHeight - (gap - drop + 12) - copy.offsetHeight;
+      // 内容固定后,可活动空间 = 顶栏底 → © 顶。取居中再上移 12px,与 © 至少留 12px
+      var slack = bottom - top - inner.offsetHeight;
+      var pad = Math.min(slack - 12, slack / 2 - 12);
+      pad = Math.max(0, Math.min(pad, slack - 12));
+      frozenTop = Math.round(top + Math.max(0, pad));
+      frozenW = w;
+      inner.style.top = frozenTop + 'px';
+    }
+    // 提手拖拽:按住卡片顶部(提手)上下拖,直接改变露出量;松手停住。
+    // 与滚动是叠加关系 —— 滚动给出基础进度,拖拽在此之上再加一段位移。
+    (function () {
+      var dragging = false, startY = 0, startDrag = 0, startScroll = 0, pid = null;
+      // ===== 惯性手感旋钮(以后只动这四个数)=====
+      // 滑行距离 ≈ 出手加成 × 初速度 × 16.7ms ÷ (1 − 摩擦)
+      var SPRING = { up: 2.0, down: 1.1 };      // 出手加成:向上推出 / 向下收回
+      var FRICTION = { up: 0.972, down: 0.94 }; // 每帧摩擦:越小滑得越远(0.94≈0.28s,0.972≈0.6s)
+      var FLICK_MIN = 35;                       // 多小的速度算"甩"(px/s)
+      var STOP_AT = 18;                         // 衰减到多慢就停(px/s)
+      var TAIL = 4;                             // 减速尾:接近边界时的限速系数(每秒),越大贴得越快
+      var STALE_MS = 80;                        // 停手超过这么久再松开,不算甩
+      var pts = [], vel = 0, glideId = 0, lastFrame = 0, lastMoveT = 0, fric = FRICTION.up;
+
+      // 速度采样用 100ms 窗口,而不是只看最后两个点 —— 单点抖动不会带偏初速度
+      function track(t, y) {
+        lastMoveT = t;
+        pts.push({ t: t, y: y });
+        while (pts.length > 2 && t - pts[0].t > 100) pts.shift();
+        var a = pts[0], b = pts[pts.length - 1];
+        var dt = Math.max(8, b.t - a.t);
+        vel = (a.y - b.y) / dt * 1000;
+      }
+
+      function apply(v) {
+        // 上限 = 剩余行程(滚动已经吃掉的部分不再重复走)
+        var remain = Math.max(0, travelPx() * (1 - pNow()));
+        dragNow = Math.max(0, Math.min(v, remain));
+        root.style.setProperty('--card-drag', dragNow.toFixed(1) + 'px');
+        syncDepth();
+      }
+      function stopGlide() { if (glideId) { cancelAnimationFrame(glideId); glideId = 0; } vel = 0; }
+
+      // 松手后的惯性滑行(手机 + 电脑同一套物理):
+      //  · 摩擦按真实帧间隔换算,120Hz / 掉帧都不会快慢不一
+      //  · 速度自然衰减到很小才停,不会突然顿住
+      function step(now) {
+        glideId = 0;
+        var dt = Math.min(24, (now - lastFrame) || 16);   // 掉帧时宁可少走一点,也不出现跳步
+        lastFrame = now;
+        vel *= Math.pow(fric, dt / 16.7);                 // 与帧率无关的摩擦(越小越省力)
+        if (Math.abs(vel) < STOP_AT) { vel = 0; return; }
+
+        // ── 减速尾 ──
+        // 离边界越近,允许的最大速度越小(上限 = 剩余行程 × TAIL/秒)。
+        // 速度是连续的,所以不会有顿挫;越接近终点越慢,像有重量地贴上去,且不会越界。
+        var up = vel > 0;
+        var t = travelPx() || 1;
+        // 剩余行程必须把「滚动已吃掉的部分」扣掉:
+        //   手机端总升幅 = 滚动贡献(p×t)+ 拖拽量(dragNow),
+        //   而拖拽量的上限是 t×(1−p) —— 所以剩余 = t×(1−p) − dragNow。
+        //   (之前只减 dragNow,剩余被高估,减速尾限速不触发,表现为硬撞边界。)
+        var remain = up ? (isMobile() ? Math.max(0, t * (1 - pNow()) - dragNow) : (1 - pNow()) * t)
+                        : (isMobile() ? dragNow : pNow() * t);
+        var move = vel * dt / 1000;
+        var cap = Math.max(0, remain) * TAIL / 1000 * dt;
+        if (Math.abs(move) > cap) move = (move >= 0 ? cap : -cap);
+        if (Math.abs(move) < 0.05) { vel = 0; return; }   // 贴着终点微动就收住
+
+        if (isMobile()) {
+          apply(dragNow + move);
+        } else {
+          // 电脑端惯性走滚动:卡片升幅、景深、© 依旧同一条链路
+          var maxScroll = Math.max(1, root.scrollHeight - window.innerHeight);
+          var ratio = Math.min(1, t / maxScroll) || 1;
+          window.scrollTo({ top: window.scrollY + move / ratio, behavior: 'instant' });
+        }
+        glideId = requestAnimationFrame(step);
+      }
+      function glide() {
+        if (glideId) return;
+        var up = true;
+        // 时间基准接上「手指最后一次移动」的时刻,而不是松手时刻 ——
+        // 否则松手到第一帧之间会多出一段空白,表现为起步一顿。
+        lastFrame = Math.max(lastMoveT || performance.now(), performance.now() - 24);
+        // 出手方向决定手劲:向上「推出」给更大加成、更小摩擦(扔得远、省力);
+        // 向下「收回」加成小、摩擦大(不容易滑飞,收得住)。
+        up = vel > 0;
+        vel *= up ? SPRING.up : SPRING.down;
+        fric = up ? FRICTION.up : FRICTION.down;
+        glideId = requestAnimationFrame(step);
+      }
+      // 拖拽入口:整张卡片任意位置(提手只是视觉提示)
+      card.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;   // 只认左键
+        stopGlide();
+        dragging = true; pid = e.pointerId;
+        startY = e.clientY; startDrag = dragNow; startScroll = window.scrollY;
+        pts.length = 0; vel = 0; track(performance.now(), e.clientY);
+        card.classList.add('is-dragging');
+        if (card.setPointerCapture) { try { card.setPointerCapture(pid); } catch (_) {} }
+        e.preventDefault();
+      });
+      // 监听挂在 window 上:指针移出卡片/窗口也能持续跟随,松手也一定收得到
+      window.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        // 兜底:鼠标左键已经不按了(丢过 pointerup)就立刻结束,避免"没按键卡片乱动"
+        if (e.pointerType === 'mouse' && !(e.buttons & 1)) { end(); return; }
+        var dy = startY - e.clientY;                  // 向上拖 = 正
+        track(performance.now(), e.clientY);
+        // 拖动期间两端都走纯 transform(--card-drag),不碰滚动。
+        // 原因:改动 window.scrollY 会触发整页滚动重排,fixed 元素(卡片、内容块、页脚)
+        // 每帧都要重新定位,Safari 上这是拖动卡顿的主要来源之一。
+        // 桌面端在松手时再把这段位移一次性换算回滚动位置(见 end())。
+        apply(startDrag + dy);
+      });
+      function end() {
+        if (!dragging) return;
+        dragging = false; pid = null;
+        card.classList.remove('is-dragging');
+        // 停止移动超过 80ms 才松手,不算"甩" —— 速度窗口已经过期,按 0 处理。
+        // 否则"拖到某处、停住、再松手"会莫名其妙继续滑出去。
+        if (performance.now() - lastMoveT > STALE_MS) vel = 0;
+        if (!isMobile() && dragNow > 0) {
+          // 桌面端:把拖动期间累积的 transform 位移一次性折算成滚动位置,
+          // 之后卡片/景深/© 仍由滚动驱动,与拖拽手感完全一致。
+          var ratio = Math.min(1, _travel / _maxScroll) || 1;
+          window.scrollTo({ top: window.scrollY + dragNow / ratio, behavior: 'instant' });
+          dragNow = 0;
+          root.style.setProperty('--card-drag', '0px');
+        }
+        syncDepth();                                  // 按当前位置重算,不会被滚动覆盖成 0
+        if (Math.abs(vel) > FLICK_MIN) glide();              // 松手带速度就滑出去(手机 + 电脑),门槛放低更省力
+      }
+      window.addEventListener('pointerup', end);
+      window.addEventListener('pointercancel', end);
+      window.addEventListener('blur', end);
+      document.addEventListener('visibilitychange', function () { if (document.hidden) end(); });
+    })();
+
+    window.addEventListener('resize', function () {
+      measure();
+      if (!isMobile()) { dragNow = 0; root.style.setProperty('--card-drag', '0px'); }
+      centerContent(); onScroll();
+    });
+    measure();
+    centerContent(true);
+    window.addEventListener('load', function () { measure(); centerContent(true); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(centerContent);
+    update();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready);
+  else ready();
+})();
+</script>

@@ -233,7 +233,7 @@ disableHugoGeneratorInject = false
   #
   [[params.social]]
     name = "telegram"
-    url  = "https://telegram.org/"
+    url  = "https://t.me/Brew_Lab_Channel"
 
   [[params.social]]
     name = "email"
@@ -259,8 +259,16 @@ disableHugoGeneratorInject = false
   
   [[menu.main]]
     identifier  = "me"
+    weight      = 1
     name        = "Blogger"
     url         = "about/me/"
+    parent      = "2-about"
+
+  [[menu.main]]
+    identifier  = "blogroll"
+    weight      = 2
+    name        = "Blogroll"
+    url         = "blogroll/"
     parent      = "2-about"
 
   [[menu.main]]
