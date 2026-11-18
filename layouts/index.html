@@ -9,22 +9,29 @@
     <div class="content-center">
             <main>
                 <div>
-                    <div class="hero">
-                        {{/* 内联 SVG(而非 <img>):避免浏览器在图片上挂"视觉搜索"按钮,同时省一次请求
-                             纯装饰图,加 aria-hidden 让读屏软件跳过它 */}}
-                        <div class="hero__art" aria-hidden="true">{{ readFile "static/img/hero-art.svg" | safeHTML }}</div>
-                        <div class="hero__handle">@Mix-Coffee</div>
-                    </div>
+                    {{/* 桌面:左列 = 碰杯主视觉 + @Mix-Coffee + 三个社交图标;右列 = 点阵字
+                         手机:同一棵 DOM 竖排(见 custom.css 的「分设备参数」段) */}}
+                    <div class="hero-row">
+                        <div class="hero-col">
+                            <div class="hero">
+                                {{/* 内联 SVG(而非 <img>):避免浏览器在图片上挂"视觉搜索"按钮,同时省一次请求
+                                     纯装饰图,加 aria-hidden 让读屏软件跳过它 */}}
+                                <div class="hero__art" aria-hidden="true">{{ readFile "static/img/hero-art.svg" | safeHTML }}</div>
+                                <div class="hero__handle">@Mix-Coffee</div>
+                            </div>
 
-                    <h1>{{ .Site.Params.homeTitle | default .Site.Title }}</h1>
-
-                    {{ partial "subtitle.html" . }}
-
-                    {{- with .Site.Params.social }}
-                        <div>
-                            {{ partial "social-icons.html" . }}
+                            {{- with .Site.Params.social }}
+                                <div class="hero-social">
+                                    {{ partial "social-icons.html" . }}
+                                </div>
+                            {{- end }}
                         </div>
-                    {{- end }}
+
+                        {{/* 点阵字:原来 h1 + 副标题的内容,由壁纸包源码离线烘焙成透明 PNG;
+                             h1 保留给读屏与搜索引擎,视觉上隐藏(.sr-only) */}}
+                        <h1 class="sr-only">{{ .Site.Params.homeTitle | default .Site.Title }}{{ with .Site.Params.homeSubtitle }} — {{ . }}{{ end }}</h1>
+                        <div class="pixtext" aria-hidden="true"><span class="pixtext__cursor"></span></div>
+                    </div>
                 </div>
             </main>
     </div>

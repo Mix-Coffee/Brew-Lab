@@ -269,6 +269,8 @@ body.home {
    整页渐变层:fixed 元素,静止不动,不随页面滚动
    · 用元素承担而不是 background-attachment:fixed —— 后者在 Safari 滚动时会抽动
    (曾有 30 秒一周期的缓慢漂移动画,已按要求移除)
+   · 浅色 = 原来的黄色渐变(SVG,拉伸铺满);深色 = 纯黑,不铺图
+   · 标题文字不在这一层,由页面里的点阵图 .pixtext 显示
    ============================================================ */
 body.home .hero-bg {
   position: fixed;
@@ -281,8 +283,8 @@ body.home .hero-bg {
   background-repeat: no-repeat;
 }
 [data-theme="dark"] body.home .hero-bg {
-  background-color: #473A7E;
-  background-image: url('/img/hero-bg-purple.svg');
+  background-color: #000000;
+  background-image: none;
 }
 
 /* 页脚在首页透明,让渐变一直铺到底(两种模式通用) */
@@ -316,6 +318,53 @@ body.home .footer__content a { color: rgba(46, 32, 24, .72); }
 [data-theme="dark"] body.home .footer__content a { color: rgba(244, 239, 255, .74); }
 
 [data-theme="dark"] .hero__handle { color: #F7F3FF; }
+
+/* ============================================================
+   点阵字 .pixtext
+   · 内容 = 原来首页的标题与副标题("Hello! here is Brew-Lab" / "Lab notes & builds, all brewed here.")
+   · 由壁纸包源码(macintosh-bg.js,5×7 点阵字库)在无头 Chrome 里离线导出成
+     矢量 SVG(每颗点一条矩形路径,浅色墨 #2E2018 / 深色墨 #F7F3FF,红点 #ff2a23),不引入运行时 JS
+   · 必须是矢量:PNG 缩到 1/4 时非整数采样会让点的大小深浅不一,看着"歪"
+   · 用 background-image 而不是 <img>:只下载当前主题那一张(每张约 19KB)
+   · 具体宽度在文件末尾「分设备参数」段里按端给,这里只放共用结构
+   ============================================================ */
+.pixtext {
+  margin-left: auto;
+  margin-right: auto;
+  aspect-ratio: 927.68 / 359.95;     /* 与 SVG viewBox 一致 → 加载前就占好位,不会跳动 */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  position: relative;                 /* 给闪动光标做定位基准 */
+  background-image: url('/img/pixtext-light.svg');
+}
+[data-theme="dark"] .pixtext { background-image: url('/img/pixtext-dark.svg'); }
+
+/* 点阵字里的闪动光标:与顶栏 .logo__cursor 同一套(颜色 #FE5186、1s、同一组 @keyframes cursor)
+   位置按 SVG 里的百分比算 —— "Brew-Lab" 行右端 56.45%、行顶 32.78%、行高 21.03%,
+   24px 嫌粗、12px 嫌细长,现定 16×28(比例 0.57,贴近顶栏 10:16);百分比缩放所以桌面/手机通用 */
+.pixtext__cursor {
+  position: absolute;
+  left: 58.28%;     /* 桌面右移 4px(原 57.45%) */
+  top: 37.92%;      /* 桌面上移前居中在 35.77%,他要求往下 4px */
+  width: 3.33%;     /* 桌面 16px:介于最初 24px(太粗)和 12px(太细)之间,比例 16:28 ≈ 顶栏的 10:16 */
+  height: 15.05%;   /* 桌面 28px,比行高 39px 短一截 */
+  background-color: #FE5186;
+  border-radius: 1px;
+  animation: cursor 1s ease infinite;
+  pointer-events: none;
+}
+
+/* 只给读屏软件看的文字(标题语义保留,视觉上不占位) */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* 主体:尺寸由文件末尾「分设备参数」段按 --hero-art-h 算出,
    这里只保留块级居中用的外边距(原来的固定 width / 600px 断点都已被末尾那条覆盖,已删) */
@@ -376,9 +425,9 @@ body.home .header {
 html, body { overscroll-behavior: none; }
 
 html { background-color: #FDECC7; }
-html[data-theme="dark"] { background-color: #544C75; }   /* data-theme 就挂在 html 上,不能写成 [data-theme] html */
+html[data-theme="dark"] { background-color: #000000; }   /* data-theme 就挂在 html 上,不能写成 [data-theme] html */
 
-/* 深色模式:与浅色同一套显示方式 —— 菜单栏同样透明,直接融进紫渐变
+/* 深色模式:与浅色同一套显示方式 —— 菜单栏同样透明,直接融进纯黑背景
    (--header-bg 仍保留深紫值,给手机端展开菜单的浮层用,保证不透明可读) */
 [data-theme=dark] body.home {
   --header-bg: #2C2158;
@@ -661,7 +710,7 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
   body.home { --hero-art-h: clamp(200px, 30vh, 300px); }   /* 碰杯图高度 */
   /* 让「酒瓶」竖直中心落在视口 42% 处:减去半个图高;末尾 -40px = 整体再上抬的像素数 */
   body.home .content-center { padding-top: max(68px, calc(42vh - var(--hero-art-h) / 2 - 40px)); }
-  body.home .footer { padding-bottom: 8px; }
+  .footer { padding-bottom: 8px; }        /* 首页/二级页统一:页脚底边留 8px(主题默认 14px,差 6px 就是版权行高低不一致的原因) */
 
   .header { padding: 20px 32px; }
   .logo__text { font-size: 20px; letter-spacing: 0.8px; }   /* 左上角 logo:字号 20px,字距 0.8px */
@@ -671,19 +720,40 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
   .header__right .theme-toggle { margin-right: 4px; }
   .header__right .menu-trigger { margin-left: 4px; }
   .hero__handle { font-size: 2.7em; }
+  /* 首页两栏:左列 = 碰杯主视觉 + @Mix-Coffee + 三个社交图标;右列 = 点阵字 */
+  body.home .hero-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+    width: 100%;
+    max-width: 900px;
+  }
+  body.home .hero-col { display: flex; flex-direction: column; align-items: center; flex: 0 0 auto; }
+  body.home .hero { margin-bottom: 6px; }
+  body.home .hero-social { margin-top: 4px; }
+  /* 点阵字:定宽 480,空间不够时由 flex 收缩(flex-basis 同时给了收缩基准) */
+  body.home .pixtext { flex: 0 1 480px; width: 480px; max-width: 480px; min-width: 0; margin: 0;
+                       transform: translateY(20px); }   /* 整块下移的像素数(当前 20px,只影响桌面) */
 }
 
 /* ---------- 手机(<685px) ---------- */
 @media (max-width: 684px) {
   body.home { --hero-art-h: 220px; }                      /* 碰杯图(他说的 logo)高度 */
   body.home .content-center { padding-top: max(60px, calc(42vh - var(--hero-art-h) / 2 - 40px)); }
-  body.home .footer { padding-bottom: 6px; }
+  .footer { padding-bottom: 6px; }        /* 同上,手机端 6px */
 
   /* 顶栏 logo 实测值(390 宽):文字 16px / 图案 22px / 图标 24px
      —— 主题默认文字是 18px,这里只收到 16px 并收紧字距;图案沿用全局 22px,手机端没有单独覆盖 */
   .logo__text { font-size: 16px; letter-spacing: 0.2px; }   /* 字号 18 → 16;字距收自主题的 0.96px */
   /* @Mix-Coffee 收到 30px(2.7em → 1.875em),让它比顶栏 logo 弱一档 */
   .hero__handle { font-size: 1.875em; }
+  /* 手机:同一棵 DOM 竖排 —— 主视觉 → @Mix-Coffee → 社交图标 → 点阵字 */
+  body.home .hero-row { display: flex; flex-direction: column; align-items: center; width: 100%; }
+  body.home .hero-col { display: flex; flex-direction: column; align-items: center; }
+  body.home .hero-social { margin-top: 4px; }
+  body.home .pixtext { flex: 0 0 auto; width: 300px; max-width: 86vw; margin: 16px 0 12px; }
 }
 
 /* ---------- 矮屏兜底:一屏锁死的前提下,视口太矮就把主视觉再压小 ---------- */
@@ -694,3 +764,25 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
 @media (max-height: 560px) {
   body.home { --hero-art-h: 110px; }
 }
+
+/* ============================================================
+   二级页面统一到首页的底色与透明框架(2026-11)
+   · 首页的底色铺在 .hero-bg 图层上,其它页面没有那一层,原样是主题的白底 + 灰顶栏
+   · 这里给除首页以外的页面补同样的底色:浅色 = 黄渐变,深色 = 纯黑
+   · 顶栏 / 页脚跟着透明,页脚文字换成暖棕(原来是 #999,压在这个底色上只有 1.7:1)
+   ============================================================ */
+body:not(.home) {
+  background-color: #F7BC5C;
+  background-image: url('/img/hero-bg.svg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;   /* 长文滚动时底色不跟着走 */
+}
+[data-theme="dark"] body:not(.home) { background-color: #000000; background-image: none; }
+
+body:not(.home) .header { background: transparent; }
+body:not(.home) .footer { background: transparent; }
+body:not(.home) .footer__content,
+body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
+[data-theme="dark"] body:not(.home) .footer__content,
+[data-theme="dark"] body:not(.home) .footer__content a { color: rgba(244, 239, 255, .74); }
