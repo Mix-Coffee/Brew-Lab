@@ -1,4 +1,22 @@
 {{/* 站点自定义 <head> 注入点(主题 head.html 会包含此文件) */}}
+
+{{/* 首帧定色:必须放在 <head> 里同步执行。
+     主题的 bundle.js 在 body 末尾才写 data-theme,系统深色的访客会先看到一帧浅色底 ——
+     本站的渐变层、页脚、html 底色都只写了 [data-theme="dark"] 分支,没有 prefers-color-scheme 兜底。
+     判定逻辑与主题 main.js 的 detectOSColorTheme 一致(本地选过就用选过的,否则跟随系统),
+     之后主题再设同一个值,不会互相打架。 */}}
+<script>
+(function () {
+  try {
+    var saved = localStorage.getItem('theme');
+    var mode = (saved === 'dark' || saved === 'light')
+      ? saved
+      : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', mode);
+  } catch (e) {}
+})();
+</script>
+
 {{/* 预加载常用字重,避免首屏先用备用字体再切换(消除"变细"闪烁) */}}
 <link rel="preload" href="/fonts/Figtree-400-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/Figtree-700-latin.woff2" as="font" type="font/woff2" crossorigin>

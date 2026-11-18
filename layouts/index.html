@@ -10,8 +10,9 @@
             <main>
                 <div>
                     <div class="hero">
-                        {{/* 内联 SVG(而非 <img>):避免浏览器在图片上挂"视觉搜索"按钮,同时省一次请求 */}}
-                        <div class="hero__art">{{ readFile "static/img/hero-art.svg" | safeHTML }}</div>
+                        {{/* 内联 SVG(而非 <img>):避免浏览器在图片上挂"视觉搜索"按钮,同时省一次请求
+                             纯装饰图,加 aria-hidden 让读屏软件跳过它 */}}
+                        <div class="hero__art" aria-hidden="true">{{ readFile "static/img/hero-art.svg" | safeHTML }}</div>
                         <div class="hero__handle">@Mix-Coffee</div>
                     </div>
 

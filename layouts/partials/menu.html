@@ -1,0 +1,42 @@
+{{/* 站点覆盖版 menu.html —— 内容与主题 layouts/partials/menu.html 一致,
+     只改一处:二级菜单的链接也走 relLangURL。
+
+     主题原写法是 <a href="{{ .URL }}">,即裸相对路径("about/me/""blogroll/")。
+     在首页(/)点没事,但站内任意非根页面(如 /posts/)点「关于 → Blogger」会被解析成
+     /posts/about/me/ → 404。加 relLangURL 后统一输出 /about/me/。 */}}
+<nav class="menu">
+    <ul class="menu__inner">
+        {{- $currentPage := . -}}
+        {{ range sort .Site.Menus.main ".Identifier" -}}
+            {{ if .HasChildren }}
+                <div class="submenu">
+                    <li class="dropdown">
+                    <a href="javascript:void(0)" class="dropbtn">{{ .Name }}</a>
+                    <div class="dropdown-content">
+                    {{ range .Children }}
+                        <a href="{{ .URL | relLangURL }}">{{ .Name }}</a>
+                    {{ end }}
+                    </div>
+                    </li>
+                </div>
+            {{ else }}
+                <li><a href="{{ .URL | relLangURL }}">{{ .Name }}</a></li>
+            {{ end }}
+        {{- end }}
+
+        {{- if .Site.Params.EnableGlobalLanguageMenu }}
+        <ul class="submenu">
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">{{ .Language }}</a>
+                <div class="dropdown-content">
+                    {{- if hugo.IsMultilingual }}
+                        {{ range $.Translations }}
+                            <a title="{{ .Language }}" href="{{ .Permalink }}">{{ .Language }}</a>
+                        {{ end }}
+                    {{- end }}
+                </div>
+            </li>
+        </ul>
+        {{- end }}
+    </ul>
+</nav>

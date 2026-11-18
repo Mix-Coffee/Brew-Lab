@@ -317,10 +317,9 @@ body.home .footer__content a { color: rgba(46, 32, 24, .72); }
 
 [data-theme="dark"] .hero__handle { color: #F7F3FF; }
 
-/* 主体 */
+/* 主体:尺寸由文件末尾「分设备参数」段按 --hero-art-h 算出,
+   这里只保留块级居中用的外边距(原来的固定 width / 600px 断点都已被末尾那条覆盖,已删) */
 .hero {
-  width: 430px;
-  max-width: 80vw;
   margin: 0 auto 18px;
 }
 .hero__art,
@@ -339,11 +338,7 @@ body.home .footer__content a { color: rgba(46, 32, 24, .72); }
   transform: rotate(-2.5deg);
 }
 
-@media (max-width: 600px) {
-  .hero { width: 300px; max-width: 78vw; }
-}
 /* 手机端的 logo / @Mix-Coffee / 图标尺寸统一收在文件末尾「分设备参数」那一段 */
-
 /* ============================================================
    首页专用:菜单栏与整页渐变同色
    浅色模式 → 菜单栏透明,直接透出同一张渐变底(顶部最亮那部分)
@@ -577,10 +572,6 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
   /* 切换图标排在汉堡左侧。.header__right 是 row-reverse,order 越小越靠右 */
   .header__right .theme-toggle { order: 1; margin-right: 4px; margin-left: 0; transform: translateY(1px); }
   .header__right .menu-trigger { margin-left: 4px; }
-  /* 首页整页渐变用 fixed 会让手机滚动时每帧重绘整屏,改成随内容滚动 */
-  body.home {
-    background-attachment: scroll; background-size: 100% 100%, 100% 100%;
-  }
 }
 
 /* 尊重系统的"减弱动态效果" */
@@ -688,9 +679,10 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
   body.home .content-center { padding-top: max(60px, calc(42vh - var(--hero-art-h) / 2 - 40px)); }
   body.home .footer { padding-bottom: 6px; }
 
-  /* 顶栏 logo 保持主题默认字号(18px / 22px 图案 / 24px 图标),只收紧字距 */
+  /* 顶栏 logo 实测值(390 宽):文字 16px / 图案 22px / 图标 24px
+     —— 主题默认文字是 18px,这里只收到 16px 并收紧字距;图案沿用全局 22px,手机端没有单独覆盖 */
   .logo__text { font-size: 16px; letter-spacing: 0.2px; }   /* 字号 18 → 16;字距收自主题的 0.96px */
-  /* @Mix-Coffee 收到 30px(2.55em → 1.875em):让顶栏 logo(文字 21px / 图案 34px)在二者之间更大 */
+  /* @Mix-Coffee 收到 30px(2.7em → 1.875em),让它比顶栏 logo 弱一档 */
   .hero__handle { font-size: 1.875em; }
 }
 
