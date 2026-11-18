@@ -708,8 +708,10 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
 /* ---------- 桌面(≥685px) ---------- */
 @media (min-width: 685px) {
   body.home { --hero-art-h: clamp(200px, 30vh, 300px); }   /* 碰杯图高度 */
-  /* 让「酒瓶」竖直中心落在视口 42% 处:减去半个图高;末尾 -40px = 整体再上抬的像素数 */
-  body.home .content-center { padding-top: max(68px, calc(42vh - var(--hero-art-h) / 2 - 40px)); }
+  /* 主体在「顶栏下沿 → 页脚上沿」之间垂直居中(2026-11 他的要求)。
+     padding-top = 顶栏高度 71px(20+31+20),其余空间由 flex 居中分配;
+     原来那条把酒瓶锁在视口 42% 的 calc 公式已停用,想恢复见 git 历史 */
+  body.home .content-center { padding-top: 71px; justify-content: center; }
   .footer { padding-bottom: 8px; }        /* 首页/二级页统一:页脚底边留 8px(主题默认 14px,差 6px 就是版权行高低不一致的原因) */
 
   .header { padding: 20px 32px; }
@@ -741,7 +743,7 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
 /* ---------- 手机(<685px) ---------- */
 @media (max-width: 684px) {
   body.home { --hero-art-h: 220px; }                      /* 碰杯图(他说的 logo)高度 */
-  body.home .content-center { padding-top: max(60px, calc(42vh - var(--hero-art-h) / 2 - 40px)); }
+  body.home .content-center { padding-top: 58px; justify-content: center; }   /* 手机:顶栏 58px 以下居中 */
   .footer { padding-bottom: 6px; }        /* 同上,手机端 6px */
 
   /* 顶栏 logo 实测值(390 宽):文字 16px / 图案 22px / 图标 24px
