@@ -292,11 +292,7 @@ body.home .footer { background: transparent; }
 /* 首页大标题:字宽略增(42px → 45px,仅桌面端,避免影响手机端主题字号) */
 @media (min-width: 685px) { body.home h1 { font-size: 2.8125rem; } }
 
-/* 大标题的景深缩放比页面其它部分更明显(0.955 全局 → 0.91 这里),
-   让它在下沉时缩得更狠、更"退后" */
 body.home h1 {
-  transform-origin: 50% 50%;
-  transform: scale(calc(1 - 0.09 * var(--card-d, 0)));
   margin-bottom: 8px;                      /* 原本 30px 空档,slogan 离得太远 */
 }
 
@@ -305,18 +301,6 @@ body.home h1 {
 body.home main p { margin: 0 0 8px; }
 
 body.home h1 { color: #2E2018; }
-
-/* 深色模式:同一张紫渐变图 + 少量白提亮(亮的幅度要比浅色小) */
-[data-theme="dark"] body.home .bottom-card {
-  background: rgba(91, 76, 154, .30);       /* 与浅色同步变透(原 58%) */
-  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.30),
-              inset 0 -1px 0 rgba(255, 255, 255, 0.12),
-              inset 0 0 26px rgba(255, 255, 255, 0.08);
-}
-[data-theme="dark"] body.home .bottom-card::before {
-  background-image: linear-gradient(rgba(255, 255, 255, .12), rgba(255, 255, 255, .12));
-  opacity: .10;   /* 上一行把提亮层整体提到 .20,这里给深色写回原值,深色不受影响 */
-}
 
 body.home .footer__content,
 body.home .footer__content a { color: rgba(46, 32, 24, .72); }
@@ -357,8 +341,8 @@ body.home .footer__content a { color: rgba(46, 32, 24, .72); }
 
 @media (max-width: 600px) {
   .hero { width: 300px; max-width: 78vw; }
-  .hero__handle { font-size: 2.1em; }
 }
+/* 手机端的 logo / @Mix-Coffee / 图标尺寸统一收在文件末尾「分设备参数」那一段 */
 
 /* ============================================================
    首页专用:菜单栏与整页渐变同色
@@ -386,22 +370,6 @@ body.home .header {
   -webkit-backdrop-filter: none;
           backdrop-filter: none;
   border-radius: 0;
-}
-
-/* 底部白卡几何(全部集中在这里,后续微调只改这几个数):
-   --card-h   卡片升满时的高度
-   --card-gap 卡片底边距视口底的空隙(底下露出主页底色)
-   --card-drop 静止时额外往下压的量 → 静止可见高度 = --card-gap - --card-drop */
-:root {
-  --card-h: 82dvh;          /* dvh:手机地址栏收起时也算对,不会把卡片撑过高 */
-  --card-gap: 34px;         /* 由 44px 降低 10px */
-  --card-drop: 4px;          /* 34 - 4 = 静止露出 30px(与上一版一致) */
-}
-@media (max-width: 684px) {
-  :root {
-    --card-h: calc(72dvh + 20px);   /* 手机端:顶部再高 20px */
-    --card-gap: 56px;               /* 34 → 56:静止露出 30 → 52px,手指才好点中 */
-  }
 }
 
 /* 滚动到顶继续滚时,浏览器露出的"页面之外"是画布颜色 —— 由 html 背景决定。
@@ -610,7 +578,7 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
   .header__right .theme-toggle { order: 1; margin-right: 4px; margin-left: 0; transform: translateY(1px); }
   .header__right .menu-trigger { margin-left: 4px; }
   /* 首页整页渐变用 fixed 会让手机滚动时每帧重绘整屏,改成随内容滚动 */
-  body.home, body.home .bottom-card, body.home .bottom-card::before {
+  body.home {
     background-attachment: scroll; background-size: 100% 100%, 100% 100%;
   }
 }
@@ -640,201 +608,78 @@ main a[href*="mailto:"]:hover svg      { color: #F2F2F2; }   /* 浅色模式:白
 main a[href*="github.com"]:hover svg   { color: #6E5494; }   /* GitHub 紫 */
 
 /* ============================================================
-   首页底部白卡(固定 + 覆盖)
-   · 卡片固定在屏幕底部;上方内容同样 fixed 钉住不动,被卡片从下往上盖住并下沉
-   · 升幅由 --card-p 驱动:静止露 24px → 滚到底升到 95vh
-   · 页面可滚动高度由 main 的 padding-bottom 撑出
-   · 不加 transition —— 跟手位移必须即时,否则滚动会有拖影
+   首页 / 顶栏 —— 分设备参数(唯一入口)
+   桌面与手机各一套,互不影响:改手机只动「手机」那段,改电脑只动「桌面」那段。
+   分段点 685px,与主题断点一致。
    ============================================================ */
-body.home .bottom-card {
-  position: fixed;
-  left: 50%;
-  right: auto;
-  bottom: 0;
-  z-index: 60;
-  width: 76%;
-  margin-left: -38%;
-  height: var(--card-h);
-  /* 毛玻璃:半透明暖色底 + 背景虚化。原来的不透明渐变挪到 ::before 上并整体降透明度,
-     这样"颜色还是那个颜色",但能透出背后被虚化的主页渐变。 */
-  background: rgba(255, 253, 250, .55);       /* 浅色:近白底,靠不透明度把背面的琥珀黄压下去 */
-  /* 不再用 backdrop-filter。
-     它要在卡片每次位移时重新采样整个背景 —— 这是 Safari 上拖动卡顿的最大来源。
-     视觉上损失很小:卡片背后要么是平滑的主页渐变(模糊它等于没变),
-     要么是被景深模糊过的内容(本身已经是模糊的),所以拿掉几乎看不出差别。
-     玻璃感由「半透明底色 + 白提亮 + 上缘高光 + 超椭圆圆角」承担。 */
-  /* 这里曾加过 will-change: transform + backface-visibility: hidden 做层提升,
-     实测会让固定元素在滚动时出现重栅格闪烁 —— 性能收益已由 JS 侧的修复拿到,
-     这两条不再需要。 */
-  border-radius: 34px;                        /* 四角同圆角(含底部) */
-  corner-shape: superellipse(1.8);            /* 苹果式超椭圆,与四角一起生效 */
-  /* Liquid Glass 的"玻璃厚度":上缘一道亮线 + 下缘弱反光 + 内侧柔光。
-     这是材质本身的高光,不是分割线。外阴影已按用户要求全部去掉。 */
-  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.55),
-              inset 0 -1px 0 rgba(255, 255, 255, 0.20),
-              inset 0 0 26px rgba(255, 255, 255, 0.16);
-  /* 静止时可见高度 = 44px(底部抬高量) + 这个偏移量。
-   置为负数就是"再往下压",现在 44 + (-14) = 30px */
-  transform: translateY(calc((1 - var(--card-p, 0)) * (100% + var(--card-drop))
-                             - var(--card-drag, 0px)));   /* 提手拖拽的叠加位移 */
-  cursor: grab;
-  touch-action: none;                          /* 拖提手时不要连带滚动页面 */
-  bottom: var(--card-gap);
+
+/* ---------- 共用:只放结构与比例,不放具体尺寸 ---------- */
+/* 首页锁死一屏:不产生任何滚动(dvh 兼顾手机地址栏收起) */
+body.home {
+  height: 100dvh;
+  overflow: hidden;
+}
+body.home .container {
+  height: 100%;
+  min-height: 0;
 }
 
-/* 掠过高光:斜向一道淡白,模拟玻璃表面反光(不随时间动,避免干扰阅读) */
-body.home .bottom-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  corner-shape: superellipse(1.8);
-  /* 两层:①极细噪点(打碎渐变的 8 位色阶,约 3.5% 不透明度,肉眼几乎看不出颗粒)
-            ②掠过高光 */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),
-                    linear-gradient(103deg,
-                      rgba(255, 255, 255, 0.26) 0%,
-                      rgba(255, 255, 255, 0.00) 34%,
-                      rgba(255, 255, 255, 0.00) 64%,
-                      rgba(255, 255, 255, 0.14) 100%);
-  background-size: 140px 140px, 100% 100%;
-  background-repeat: repeat, no-repeat;
-  pointer-events: none;
-}
-[data-theme="dark"] body.home .bottom-card::after {
-  /* 噪点层保持不变(上面已定义),只换掠光 */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"),
-                    linear-gradient(103deg,
-                      rgba(255, 255, 255, 0.16) 0%,
-                      rgba(255, 255, 255, 0.00) 34%,
-                      rgba(255, 255, 255, 0.00) 64%,
-                      rgba(255, 255, 255, 0.08) 100%);
-  background-size: 140px 140px, 100% 100%;
-  background-repeat: repeat, no-repeat;
+body.home .container {
+  min-height: 100vh;             /* 撑满一屏 → 页脚永远贴屏幕底边 */
+  display: flex;
+  flex-direction: column;
 }
 
-/* 卡片上的一层白色提亮(半透明)。
-   注意:这里**不再**放那份 hero 渐变图 —— 卡片已经是半透明,主页自己的渐变会透过来;
-   再叠一层同样的图,两张图的对齐方式(attachment/size)不同,会错开露出"内层形状"的边,
-   四角看着就像圆角错位。现在只保留提亮,颜色完全由"透出来的主页渐变 + 暖色底"决定。 */
-body.home .bottom-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  corner-shape: superellipse(1.8);   /* 必须显式写:corner-shape 不随 border-radius:inherit 一起继承 */
-  background-image: linear-gradient(rgba(255, 255, 255, .62), rgba(255, 255, 255, .62));
-  opacity: .55;   /* 白提亮层:把背面透上来的琥珀黄洗淡,这是变浅白的关键 */
-  pointer-events: none;
+body.home .content-center {
+  flex: 1 1 auto;
+  justify-content: flex-start;   /* 主轴纵向,具体位置由各设备段的 padding-top 决定 */
+  align-items: center;
+  padding-bottom: 0;
 }
 
-/* 滚动时:内容**钉住不动**(不跟页面上移),由卡片从下方盖上来。
-   景深随滚动渐进 —— 缩小 + 模糊 + 压暗,并向上"沉"一小段(translateY 为正=往下)。
-   --card-d 在滚动到 70% 时就封顶,也就是被卡片盖住的那一刻模糊已经最重。 */
-/* 注意:filter 不能留在 .content-center 上 —— 父元素一旦有 filter(哪怕 blur(0px)),
-   就会成为 fixed 子元素的包含块,内容会跟着页面一起滚。必须挂在 fixed 元素自身。 */
+/* 主视觉:高度由 --hero-art-h 决定,宽度按 SVG 原始 440:398 的比例算出来并居中
+   (不能写 width:auto —— SVG 元素的 auto 宽度会退化成 100%,图会被压扁) */
+body.home .hero { width: auto; max-width: 80vw; }
+body.home .hero__art {
+  height: var(--hero-art-h);
+  width: calc(var(--hero-art-h) * 440 / 398);
+  margin: 0 auto;
+}
+body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
 
-/* 真正滚动的动画作用在这一层(fixed):内容钉在视口里不动,
-   由卡片从下方盖上来;景深让它缩小 + 模糊 + 往下沉。
-   fixed 会脱离文档流,但页面高度由 main 的 padding-bottom 撑着,不受影响。 */
-body.home .content-center > main > div {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 62px;                                  /* JS 会按"居中"重算 */
-  z-index: 1;                                 /* 低于卡片(60)与页脚(61) */
-  transform-origin: 50% 12%;
-  transform: scale(calc(1 - 0.045 * var(--card-d, 0))) translateY(calc(26px * var(--card-d, 0)));
-  /* filter 用 --card-dq(量化到 8 档)。filter 一变就要重新栅格化整屏,
-     Safari 上这是第二大开销 —— 量化后整个拖动只重算 8 次。
-     平移/缩放仍用平滑的 --card-d(transform 走合成器,不影响性能)。 */
-  filter: blur(calc(5px * var(--card-dq, 0)))
-          brightness(calc(1 - 0.11 * var(--card-dq, 0)))
-          saturate(calc(1 - 0.16 * var(--card-dq, 0)));
+/* ---------- 桌面(≥685px) ---------- */
+@media (min-width: 685px) {
+  body.home { --hero-art-h: clamp(200px, 30vh, 300px); }   /* 碰杯图高度 */
+  /* 让「酒瓶」竖直中心落在视口 42% 处:减去半个图高;末尾 -40px = 整体再上抬的像素数 */
+  body.home .content-center { padding-top: max(68px, calc(42vh - var(--hero-art-h) / 2 - 40px)); }
+  body.home .footer { padding-bottom: 8px; }
+
+  .header { padding: 20px 32px; }
+  .logo__text { font-size: 18px; letter-spacing: 0; }
+  .header .logo__mark svg { height: 22px; vertical-align: -4px; }
+  .header__right .theme-toggle, .header__right .menu-trigger { width: 24px; height: 24px; }
+  .header__right .theme-toggle svg, .header__right .menu-trigger svg { width: 24px; height: 24px; }
+  .header__right .theme-toggle { margin-right: 4px; }
+  .header__right .menu-trigger { margin-left: 4px; }
+  .hero__handle { font-size: 2.7em; }
 }
 
-/* 内容整体下移一档:原来紧贴顶栏下方,显得偏高 */
-/* 卡片提手:真实元素(伪元素设不了 touch-action,手机上会被滚动手势吞掉拖拽)
-   96×32 是触控区,真正画出来的小条是里面的 ::after */
-body.home .bottom-card__handle {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 96px;
-  height: 32px;
-  touch-action: none;
-  cursor: grab;
-}
-body.home .bottom-card__handle::after {
-  content: "";
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 48px;
-  height: 5px;
-  border-radius: 3px;
-  background: rgba(46, 32, 24, .16);
-}
-[data-theme="dark"] body.home .bottom-card__handle::after { background: rgba(255, 255, 255, .22); }
-
-body.home .bottom-card.is-dragging, body.home .bottom-card.is-dragging .bottom-card__handle { cursor: grabbing; }
-/* 整张卡片都是拖拽区。
-   transition 必须显式关掉:主题里有通用过渡规则会盖掉本站点样式,
-   卡片每帧都在改 transform,若还带过渡就会"滞后跟随/抽搐"。 */
-body.home .bottom-card { cursor: grab; transition: none !important; }
-body.home .bottom-card__handle { transition: none !important; }
-/* 页脚(© 那行)和上方内容同样是每帧跟随,不能带过渡 */
-body.home .footer, body.home .footer span { transition: none !important; }
-body.home .content-center main > div { transition: none !important; }
-
-body.home .content-center { padding-top: 24px; }   /* 兜底值,JS 会按居中重算并写到内层 fixed 块的 top */
-
-/* 页面可滚动高度改由主内容撑出 —— 页脚要浮起来,不能再靠它的留白撑高 */
-body.home main { padding-bottom: 300vh; }  /* 可滚动高度(内容已 fixed,不再撑高,全靠这里) */
-
-/* 页脚:钉在卡片上边缘之上,随卡片一起浮动(© 就像长在卡片上一样飘着)。
-   bottom = 卡片露出高度 + 12px 间距,卡片升多少它跟多少 */
-body.home .footer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  /* © 紧跟卡片上沿:滚动进度 + 提手拖拽 两段位移都要算进来,
-   否则拖拽时 © 会留在原地、和卡片脱节 */
-  bottom: calc(var(--card-gap) - var(--card-drop) + 12px
-               + var(--card-p, 0) * (var(--card-h) + var(--card-drop))
-               + var(--card-drag, 0px));
-  padding: 0;
-  text-align: center;
-  z-index: 61;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body.home .content-center { transform: none !important; filter: none !important; }
-}
-
-/* 手机端卡片加宽:76% → 90%(左右各留 5%) */
+/* ---------- 手机(<685px) ---------- */
 @media (max-width: 684px) {
-  body.home .bottom-card { width: 90%; margin-left: -45%; }
+  body.home { --hero-art-h: 220px; }                      /* 碰杯图(他说的 logo)高度 */
+  body.home .content-center { padding-top: max(60px, calc(42vh - var(--hero-art-h) / 2 - 40px)); }
+  body.home .footer { padding-bottom: 6px; }
+
+  /* 顶栏 logo 不动了 —— 之前误改,已全部还原成主题默认(18px 文字 / 22px 图案 / 24px 图标) */
+  /* @Mix-Coffee 收到 30px(2.55em → 1.875em):让顶栏 logo(文字 21px / 图案 34px)在二者之间更大 */
+  .hero__handle { font-size: 1.875em; }
 }
 
-/* 手机端:卡片只由提手驱动,滚动不再带着它走 —— 相应地触控也不该被卡片拦截 */
-/* 注:曾试过用 ::after 把卡片触控区向上扩 30px,实测无效 ——
-   卡片上方紧挨着 © 那行(它是链接、z-index 更高,不能挡),
-   剩下的空隙只有 2px。所以改成直接把手机端卡片多露一些(见下面的 --card-gap)。 */
-
-/* ===== 手机端景深加大(只影响窄屏;电脑端维持原值)=====
-   基准值来自文件上部:.content-center main > div 与 h1 的 --card-d 规则。
-   数值提高约 60~80%,让手机上"内容沉下去"的感觉更明显。 */
-@media (max-width: 684px) {
-  body.home .content-center main > div {
-    transform-origin: 50% 12%;
-    transform: scale(calc(1 - 0.075 * var(--card-d, 0)))
-               translateY(calc(40px * var(--card-d, 0)));
-    filter: blur(calc(9px * var(--card-dq, 0)))
-            brightness(calc(1 - 0.17 * var(--card-dq, 0)))
-            saturate(calc(1 - 0.24 * var(--card-dq, 0)));
-  }
-  body.home h1 { transform: scale(calc(1 - 0.13 * var(--card-d, 0))); }
+/* ---------- 矮屏兜底:一屏锁死的前提下,视口太矮就把主视觉再压小 ---------- */
+@media (max-height: 700px) {
+  body.home { --hero-art-h: clamp(120px, 24vh, 200px); }
+  body.home .content-center { padding-top: max(60px, calc(42vh - var(--hero-art-h) / 2 - 40px)); }
+}
+@media (max-height: 560px) {
+  body.home { --hero-art-h: 110px; }
 }
