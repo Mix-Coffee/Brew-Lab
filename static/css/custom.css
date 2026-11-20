@@ -1092,6 +1092,9 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
 .post-info .post-author {
   margin: .15em 0 .8em;
 }
+/* 两行图标到文字的间距取同一个值,这样「13分钟」和「抖音 @常见老花」
+   的文字左缘才对得上(主题默认 .8em 时,作者行是 .35em,两行会差 ~6px) */
+.post-info .post-meta svg,
 .post-info .post-author svg {
   margin-right: .35em;
 }
