@@ -466,8 +466,8 @@ html[data-theme="dark"] { background-color: #000000; }   /* data-theme 就挂在
 /* 弹出的菜单卡片 */
 nav.menu {
   position: absolute;
-  top: 57px;   /* 和音乐控件弹层同一条顶线(音符图标底 + 10) */
-  right: 10px;
+  top: var(--menu-top, 57px);    /* 由 note-player.js 按「图标底 + 间隙」写入,和音乐控件同一条顶线 */
+  right: var(--menu-right, 32px); /* 右边对齐图标组右缘 */
   left: auto;
   z-index: 9999;
   min-width: 150px;

@@ -442,7 +442,9 @@
       return;
     }
     var w = pop.offsetWidth || 0;
-    var right = vw - r.right;
+    var icons = document.querySelector('.header__right');
+    var anchor = icons ? icons.getBoundingClientRect().right : r.right;   // 对齐图标组右缘
+    var right = vw - anchor;
     var maxRight = vw - w - 12;
     if (right > maxRight) right = maxRight;
     if (right < 12) right = 12;
@@ -489,7 +491,19 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && open) closePop();
     });
-    window.addEventListener('resize', function () { if (open) place(); });
+    window.addEventListener('resize', function () { syncMenuPos(); if (open) place(); });
+    syncMenuPos();
+  }
+
+  // 三横菜单的定位:顶线和音乐控件同一条(图标底 + 间隙),右边对齐图标组右缘
+  function syncMenuPos() {
+    var icons = document.querySelector('.header__right');
+    var note = document.querySelector('.header-note');
+    if (!icons || !note) return;
+    var gap = window.innerWidth <= 684 ? 8 : 10;
+    var root = document.documentElement;
+    root.style.setProperty('--menu-top', Math.round(note.getBoundingClientRect().bottom + gap) + 'px');
+    root.style.setProperty('--menu-right', Math.round(window.innerWidth - icons.getBoundingClientRect().right) + 'px');
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
