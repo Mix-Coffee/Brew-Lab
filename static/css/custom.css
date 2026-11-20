@@ -531,8 +531,8 @@ nav.menu .submenu .dropdown-content,
 [data-theme="light"] nav.menu .submenu .dropdown-content,
 [data-theme="dark"] nav.menu .submenu .dropdown-content {
   position: static;
-  margin: 10px 12px 10px 12px;      /* 与「关于」拉开距离(原 2px 太挤) */
-  padding: 3px 0;
+  margin: 10px 6px;                /* 左右和外层卡片的 6px 内边距齐平,内圆角才能同心 */
+  padding: 6px;
   border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 14px;
   corner-shape: superellipse(1.8);
@@ -550,6 +550,7 @@ nav.menu .submenu .dropdown-content,
 }
 nav.menu .submenu .dropdown-content a {
   padding: 7px 12px;
+  border-radius: 8px;   /* 二级面板 14 - 内边距 6 */
   font-size: .95em;
   line-height: 1.35;
   text-align: center;          /* 二级项文字居中 */
@@ -665,12 +666,13 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
    ============================================================ */
 @media (max-width: 684px) {
   /* 切换图标排在汉堡左侧。.header__right 是 row-reverse,order 越小越靠右 */
-  .header__right .theme-toggle { order: 2; margin-right: 8px; margin-left: 0; }
-  .header__right .header-note  { order: 1; margin-right: 8px; margin-left: 0; }
-  .header__right .menu-trigger { order: 0; margin-left: 4px; }
+  /* 间距 = 桌面 × 0.8(15→12、17.5→14、13.5→11、16→13),比例一致但更紧凑 */
+  .header__right .theme-toggle { order: 2; margin-right: 12px; margin-left: 0; }
+  .header__right .header-note  { order: 1; margin-right: 11px; margin-left: 0; }
+  .header__right .menu-trigger { order: 0; margin-left: 3px; }
   /* 五个图标要塞得下:箭头做小一点,间距收紧(390 屏总宽 136.4,logo 220.8,合计 357.2 < 358) */
-  .header__right .nav-back { order: -1; margin-left: 6px; }
-  .header__right .nav-fwd  { order: -2; margin-left: 8px; }
+  .header__right .nav-back { order: -1; margin-left: 11px; }
+  .header__right .nav-fwd  { order: -2; margin-left: 13px; }
 }
 
 /* 尊重系统的"减弱动态效果" */
@@ -1067,13 +1069,17 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
 
 /* 窄屏(<=380)顶栏要塞五个图标,logo 字号收一档;放文件末尾才盖得住前面的 16px */
 /* 五个图标保持桌面尺寸不变,靠收 logo 字号腾地方 */
-@media (max-width: 420px) { .header .logo__text { font-size: 14px; letter-spacing: 0.15px; } }
-@media (max-width: 380px) { .header .logo__text { font-size: 12px; letter-spacing: 0.1px; } }
+/* logo 字号留住一点余量,否则 logo 和第一个图标会贴在一起(实测 390 屏要留 ~17px) */
+@media (max-width: 420px) { .header .logo__text { font-size: 12.5px; letter-spacing: 0.15px; } }
+@media (max-width: 380px) { .header .logo__text { font-size: 10.5px; letter-spacing: 0.1px; } }
 @media (max-width: 340px) {
-  .header .logo__text { font-size: 10.5px; }
+  .header .logo__text { font-size: 10px; }
   .header__right .nav-arrow { width: 20px; height: 20px; }
   .header__right .nav-arrow svg { width: 20px; height: 20px; }
-  .header__right .theme-toggle, .header__right .header-note { margin-right: 6px; }
-  .header__right .nav-back { margin-left: 4px; }
-  .header__right .nav-fwd  { margin-left: 6px; }
+  /* 320 这种超窄屏再收一档 */
+  .header__right .theme-toggle { margin-right: 7px; }
+  .header__right .header-note  { margin-right: 6px; }
+  .header__right .menu-trigger { margin-left: 2px; }
+  .header__right .nav-back { margin-left: 7px; }
+  .header__right .nav-fwd  { margin-left: 8px; }
 }
