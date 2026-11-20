@@ -896,7 +896,7 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
 .mp-pop .art {
     position:relative;flex:none;
     width:var(--art);height:var(--art);
-    border-radius:20px;overflow:hidden;
+    border-radius:32px;overflow:hidden;   /* 158 的 20%,接近参考图的圆角程度 */
     background:#0d0d0f;cursor:pointer;}
 .mp-pop .art > img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 .mp-pop .art .cover {
