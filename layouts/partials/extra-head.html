@@ -116,3 +116,6 @@
   window.addEventListener('resize', function () { setTimeout(ready, 60); });
 })();
 </script>
+
+{{/* 顶栏音符图标 → 迷你播放器(懒加载:第一次点图标才拉 iTunes 数据) */}}
+<script src="{{ "js/note-player.js" | relURL }}" defer></script>

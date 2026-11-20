@@ -590,8 +590,8 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
    ============================================================ */
 @media (min-width: 685px) {
   /* 三个图标左→右:深浅切换 → 音符 → 汉堡(order 整数排序) */
-  .header__right .theme-toggle { order: 1; margin-right: 4px; margin-left: 0; }
-  .header__right .header-note  { order: 2; margin-right: 2px; margin-left: 0; }
+  .header__right .theme-toggle { order: 1; margin-right: 15px; margin-left: 0; }
+  .header__right .header-note  { order: 2; margin-right: 13.5px; margin-left: 0; }
   .header__right .menu-trigger { order: 3; }
 }
 
@@ -646,8 +646,8 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
    ============================================================ */
 @media (max-width: 684px) {
   /* 切换图标排在汉堡左侧。.header__right 是 row-reverse,order 越小越靠右 */
-  .header__right .theme-toggle { order: 2; margin-right: 4px; margin-left: 0; }
-  .header__right .header-note  { order: 1; margin-right: 2px; margin-left: 0; }
+  .header__right .theme-toggle { order: 2; margin-right: 15px; margin-left: 0; }
+  .header__right .header-note  { order: 1; margin-right: 13.5px; margin-left: 0; }
   .header__right .menu-trigger { order: 0; margin-left: 4px; }
 }
 
@@ -747,7 +747,7 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
   .header .logo__mark svg { height: 22px; vertical-align: -4px; }
   .header__right .theme-toggle, .header__right .menu-trigger { width: 24px; height: 24px; }
   .header__right .menu-trigger svg { width: 24px; height: 24px; }
-  .header__right .theme-toggle { margin-right: 4px; }
+  .header__right .theme-toggle { margin-right: 15px; }
   .header__right .menu-trigger { margin-left: 4px; }
   .hero__handle { font-size: 2.7em; }
   /* 首页两栏:左列 = 碰杯主视觉 + @Mix-Coffee + 三个社交图标;右列 = 点阵字 */
@@ -801,7 +801,10 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
   .hero-social a { margin: 0 5.5px; }
   .hero-social svg { width: 16px; height: 16px; }
   /* 宽度 = min(设定值, 屏宽 - 左列实际宽 - 16),320 那种窄屏也不会和左边重叠 */
+  /* 电脑端:像素字中心比左列中心低 20px ≈ 左列高(354.8)的 5.64%;
+     手机左列高 = 碰杯图高 × 1.386,换算下来是碰杯图高的 7.8%,所以按 --hero-art-h 比例下移 */
   body.home .pixtext { flex: 0 0 auto; max-width: none; margin: 0;
+                       transform: translateY(calc(var(--hero-art-h) * 0.078));
                        width: min(var(--pixtext-w),
                                   calc(100vw - max(132px, var(--hero-art-h) * 1.1055) - 16px)); }
 }
@@ -840,3 +843,172 @@ body:not(.home) .footer__content,
 body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
 [data-theme="dark"] body:not(.home) .footer__content,
 [data-theme="dark"] body:not(.home) .footer__content a { color: rgba(244, 239, 255, .74); }
+
+/* ============================================================
+   顶栏音符图标弹层:迷你播放器(Apple Music 30 秒试听)
+   样式来自 ~/projects/迷你播放器/Apple试听版.html 的最终版,
+   全部选择器收敛到 .mp-pop 下,避免和主题的 .card/.col/.title 撞车。
+   ============================================================ */
+.mp-pop {
+    --card-w:640px;
+    --art:210px;
+    --blue:#0a84ff;
+    --ink:rgba(255,255,255,.96);
+    --ink-2:rgba(255,255,255,.62);
+    --ink-3:rgba(255,255,255,.86);
+    --t:240ms cubic-bezier(.22,.61,.36,1);
+    --art-url:none;          /* 有内嵌封面时由 JS 填 blob: URL */
+    --fallback:linear-gradient(135deg,#8a7f6a,#2f2f2a);}
+.mp-pop, .mp-pop * {box-sizing:border-box}
+.mp-pop {-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;
+            -webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.mp-pop ::selection {background:transparent}
+.mp-pop {
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"WenQuanYi Zen Hei","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.mp-pop .card {
+    position:relative;
+    width:var(--card-w);
+    display:flex;gap:24px;
+    padding:18px;
+    border-radius:26px;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow:0 24px 60px -20px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14);
+    transition:border-color var(--t), background var(--t);}
+.mp-pop .card::before {
+    content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
+    backdrop-filter:blur(24px) saturate(180%);
+    -webkit-backdrop-filter:blur(24px) saturate(180%);}
+.mp-pop .card > * {position:relative;z-index:1}
+.mp-pop .card.is-drop {border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.16)}
+.mp-pop .art {
+    position:relative;flex:none;
+    width:var(--art);height:var(--art);
+    border-radius:20px;overflow:hidden;
+    background:#0d0d0f;cursor:pointer;}
+.mp-pop .art > img {position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.mp-pop .art .cover {
+    position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:0 16px;
+    background:var(--fallback);
+    color:rgba(255,255,255,.9);font-size:12.5px;line-height:1.7;
+    transition:opacity var(--t);}
+.mp-pop .art .cover.is-hidden {opacity:0;pointer-events:none}
+.mp-pop .art-col {display:flex;flex-direction:column;align-items:center;gap:10px;flex:none}
+.mp-pop .badge {
+    position:static;display:block;line-height:0;
+    text-decoration:none;cursor:pointer;
+    transition:opacity var(--t);}
+.mp-pop .badge:hover {opacity:.78}
+.mp-pop .badge img {
+    position:static;display:block;height:15px;width:auto;}
+.mp-pop .col {flex:1;min-width:0;display:flex;flex-direction:column;min-height:236px;padding:9px 2px 2px}
+.mp-pop .row-title {display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.mp-pop .title {
+    margin:0;font-size:26px;font-weight:700;letter-spacing:-.01em;line-height:1.15;
+    color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mp-pop .eq {display:flex;align-items:flex-end;gap:3px;height:20px;flex:none;margin-top:6px;margin-right:6px}
+.mp-pop .eq i {display:block;width:3px;border-radius:2px;background:rgba(255,255,255,.72);height:40%}
+.mp-pop .eq i:nth-child(2) {height:80%}
+.mp-pop .eq i:nth-child(3) {height:55%}
+.mp-pop .eq i:nth-child(4) {height:100%}
+html[data-is-playing="true"] .mp-pop .eq i {animation:eq .9s ease-in-out infinite alternate}
+html[data-is-playing="true"] .mp-pop .eq i:nth-child(2) {animation-duration:.7s}
+html[data-is-playing="true"] .mp-pop .eq i:nth-child(3) {animation-duration:1.1s}
+html[data-is-playing="true"] .mp-pop .eq i:nth-child(4) {animation-duration:.85s}
+@keyframes eq {from{height:18%}to{height:100%}}
+.mp-pop .sub {min-width:0;display:flex;align-items:baseline;gap:10px;margin-top:10px;font-size:16.5px;color:rgba(255,255,255,.92);white-space:nowrap;overflow:hidden}
+.mp-pop .sub .album {min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-pop .sub .album::after {content:'·';margin-left:10px;color:rgba(255,255,255,.30)}
+.mp-pop .meta {margin-top:7px;font-size:15.5px;letter-spacing:.01em;color:rgba(255,255,255,.52);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-pop .sub .artist {color:rgba(255,255,255,.58);flex:0 0 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-pop .controls {display:flex;align-items:center;justify-content:center;gap:60px;margin-top:auto;margin-bottom:22px;padding:0;contain:layout paint style}
+.mp-pop .controls button {
+    display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;background:none;
+    color:rgba(255,255,255,.93);cursor:pointer;
+    transition:transform 260ms cubic-bezier(.16,1.06,.3,1);
+    will-change:transform;-webkit-tap-highlight-color:transparent;}
+.mp-pop .controls button:hover {color:#fff}
+.mp-pop .controls button:active {transform:scale(.9);transition-duration:80ms;transition-timing-function:cubic-bezier(.3,.7,.4,1)}
+.mp-pop .controls button:disabled {opacity:.35;cursor:default}
+.mp-pop .controls button:focus-visible {outline:2px solid rgba(255,255,255,.5);outline-offset:4px;border-radius:10px}
+.mp-pop .controls svg {grid-area:1/1;display:block;width:36px;height:36px;fill:currentColor;
+                transform-origin:50% 50%;transform:translateZ(0);
+                transition:opacity 200ms cubic-bezier(.4,0,.2,1), transform 200ms cubic-bezier(.4,0,.2,1);
+                backface-visibility:hidden}
+.mp-pop .controls .ico-play {opacity:1;transform:scale(1)}
+.mp-pop .controls .ico-pause {opacity:0;transform:scale(.74)}
+html[data-is-playing="true"] .mp-pop .controls .ico-play {opacity:0;transform:scale(.74)}
+html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:scale(1)}
+.mp-pop .controls button.big svg {width:42px;height:42px}
+.mp-pop .playhead {position:relative;height:6px;border-radius:3px;background:rgba(255,255,255,.34);overflow:hidden}
+.mp-pop .playhead .inner {
+    position:absolute;left:0;top:0;height:100%;width:100%;border-radius:3px;background:#fff;
+    transform:translateX(-100%);will-change:transform;}
+.mp-pop .playhead.is-paused .inner {transition:transform 170ms linear}
+.mp-pop .playhead .inner.is-loading {
+    width:100%!important;
+    background:linear-gradient(90deg,#fff 0%,#fff 50%,rgba(255,255,255,.34) 50%,rgba(255,255,255,.34) 100%);
+    background-size:200% 100%;animation:shimmer 1.4s linear infinite;}
+@keyframes shimmer {from{background-position:0 0}to{background-position:-200% 0}}
+.mp-pop .times {display:flex;justify-content:space-between;margin-top:14px;font-size:18px;color:var(--ink-3);
+         font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.mp-pop .hint {width:var(--card-w);margin:14px auto 0;font-size:11.5px;line-height:1.7;
+        color:rgba(255,255,255,.5);text-align:center}
+.mp-pop .hint .warn {color:#ff9c8a}
+@media (max-width:684px) {
+  .mp-pop {--card-w:calc(100vw - 24px);--art:124px}
+  .mp-pop .card {gap:14px;padding:14px;border-radius:22px}
+  .mp-pop .col {min-height:134px;padding-top:2px}
+  .mp-pop .title {font-size:19px}
+  .mp-pop .sub {font-size:13px;gap:7px;margin-top:6px}
+  .mp-pop .meta {font-size:11.5px;margin-top:5px}
+  .mp-pop .eq {height:14px;gap:2px;margin-top:3px}
+  .mp-pop .eq i {width:2px}
+  .mp-pop .controls {margin-bottom:12px;padding:0;gap:32px}
+  .mp-pop .controls button {width:34px;height:34px}
+  .mp-pop .controls svg {width:24px;height:24px}
+  .mp-pop .controls button.big svg {width:30px;height:30px}
+  .mp-pop .playhead {height:5px}
+  .mp-pop .times {font-size:12.5px;margin-top:9px}
+  .mp-pop .badge img {height:11px}
+  .mp-pop .art-col {gap:8px}
+  .mp-pop .art .cover {font-size:10px;line-height:1.5;padding:0 8px}
+}
+.mp-pop .eq.is-live {align-items:center}
+.mp-pop .eq.is-live i {animation:none !important;
+                height:calc(var(--h, .12) * 100%) !important;
+                border-radius:2px;transform:none;
+                transition:height 110ms cubic-bezier(.25,.7,.35,1);
+                will-change:height}
+.mp-pop .eq.is-live.is-idle i {transition:height 460ms cubic-bezier(.32,.86,.38,1)}
+
+/* ---------- 弹层本体:定位 / 开合 / 背景 ----------
+   卡片是白字 + 毛玻璃,必须自带深色底;背景用当前封面放大模糊后再压暗,
+   这样不管站点是浅色(黄)还是深色主题,白字都读得清。 */
+.mp-pop {
+  position: fixed;
+  z-index: 120;
+  width: var(--card-w);
+  border-radius: 26px;
+  overflow: hidden;
+  background: #151517;
+  box-shadow: 0 32px 80px -28px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.06);
+  opacity: 0;
+  transform: translateY(-8px) scale(.985);
+  pointer-events: none;
+  transition: opacity 170ms cubic-bezier(.16,1,.3,1), transform 170ms cubic-bezier(.16,1,.3,1);
+}
+.mp-pop.is-open { opacity: 1; transform: none; pointer-events: auto; }
+.mp-pop::before {
+  content: ''; position: absolute; inset: -20%; z-index: 0;
+  background-image: var(--art-url); background-size: cover; background-position: center;
+  filter: blur(36px) saturate(150%) brightness(.55);
+  opacity: 0; transition: opacity 320ms ease;
+}
+.mp-pop[data-has-art="true"]::before { opacity: 1; }
+.mp-pop::after { content: ''; position: absolute; inset: 0; z-index: 0; background: rgba(12,12,14,.45); }
+.mp-pop .card { position: relative; z-index: 1; }
+/* .mp-pop::after 是压暗层,普通子元素会被它盖住 → 提示行也要提到 z-index:1 */
+.mp-pop .hint { position: relative; z-index: 1; width: auto; margin: 0 18px 12px; }
