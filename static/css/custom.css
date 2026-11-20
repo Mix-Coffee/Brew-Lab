@@ -904,7 +904,7 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
 .mp-pop .art .cover.is-hidden {opacity:0;pointer-events:none}
 /* 封面居中跟右栏中心对齐:徽标绝对定位到封面下方,不参与排版,
    否则封面会被徽标顶上去,视觉中心比右栏高 10px */
-.mp-pop .art-col {position:relative;display:flex;flex-direction:column;align-items:center;align-self:center;flex:none}
+.mp-pop .art-col {position:relative;top:-8px;display:flex;flex-direction:column;align-items:center;align-self:center;flex:none}   /* top 是视觉上移,不改变排版高度 */
 .mp-pop .badge {
     position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);
     display:block;line-height:0;
@@ -977,6 +977,7 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
      比例、疏密、控件关系都和桌面版一致,不是另调的一套 */
   .mp-pop .card { gap: 11.5px; padding: 9px 9px 13px; border-radius: 12px; }
   .mp-pop .badge { top: calc(100% + 5.5px); }
+  .mp-pop .art-col { top: -5.5px; }
   .mp-pop .badge img { height: 8px; }
   .mp-pop .col { min-height: 120px; padding-top: 5px; }
   .mp-pop .title { font-size: 13.6px; }
