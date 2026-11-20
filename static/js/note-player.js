@@ -43,6 +43,11 @@
       <div class="playhead" id="playhead" aria-hidden="true">
         <div class="inner" id="inner"></div>
       </div>
+
+      <div class="times">
+        <span data-music="elapsed">00:00</span>
+        <span data-music="remaining">-00:00</span>
+      </div>
     </div>
   </div>`;
 

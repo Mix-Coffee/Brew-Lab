@@ -850,8 +850,8 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
    全部选择器收敛到 .mp-pop 下,避免和主题的 .card/.col/.title 撞车。
    ============================================================ */
 .mp-pop {
-    --card-w:560px;
-    --art:178px;
+    --card-w:500px;
+    --art:158px;
     --blue:#0a84ff;
     /* 文字/控件配色走变量,浅色主题下面整块覆盖成深色字 */
     --mp-1:rgba(255,255,255,.96);
@@ -877,9 +877,9 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
 .mp-pop .card {
     position:relative;
     width:var(--card-w);
-    display:flex;gap:20px;
-    padding:15px;
-    border-radius:20px;
+    display:flex;gap:17px;
+    padding:13px;
+    border-radius:18px;
     background:rgba(255,255,255,.10);
     border:1px solid rgba(255,255,255,.16);
     box-shadow:0 24px 60px -20px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14);
@@ -909,13 +909,13 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
     transition:opacity var(--t);}
 .mp-pop .badge:hover {opacity:.78}
 .mp-pop .badge img {
-    position:static;display:block;height:13px;width:auto;}
-.mp-pop .col {flex:1;min-width:0;display:flex;flex-direction:column;min-height:200px;padding:8px 2px 2px}
+    position:static;display:block;height:12px;width:auto;}
+.mp-pop .col {flex:1;min-width:0;display:flex;flex-direction:column;min-height:176px;padding:7px 2px 2px}
 .mp-pop .row-title {display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
 .mp-pop .title {
-    margin:0;font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.15;
+    margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em;line-height:1.15;
     color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.mp-pop .eq {display:flex;align-items:flex-end;gap:3px;height:17px;flex:none;margin-top:5px;margin-right:5px}
+.mp-pop .eq {display:flex;align-items:flex-end;gap:3px;height:15px;flex:none;margin-top:4px;margin-right:4px}
 .mp-pop .eq i {display:block;width:2.5px;border-radius:2px;background:var(--mp-ctrl);height:40%}
 .mp-pop .eq i:nth-child(2) {height:80%}
 .mp-pop .eq i:nth-child(3) {height:55%}
@@ -925,14 +925,14 @@ html[data-is-playing="true"] .mp-pop .eq i:nth-child(2) {animation-duration:.7s}
 html[data-is-playing="true"] .mp-pop .eq i:nth-child(3) {animation-duration:1.1s}
 html[data-is-playing="true"] .mp-pop .eq i:nth-child(4) {animation-duration:.85s}
 @keyframes eq {from{height:18%}to{height:100%}}
-.mp-pop .sub {min-width:0;display:flex;align-items:baseline;gap:8px;margin-top:8px;font-size:15px;color:var(--mp-2);white-space:nowrap;overflow:hidden}
+.mp-pop .sub {min-width:0;display:flex;align-items:baseline;gap:8px;margin-top:7px;font-size:14px;color:var(--mp-2);white-space:nowrap;overflow:hidden}
 .mp-pop .sub .album {min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mp-pop .sub .album::after {content:'·';margin-left:10px;color:var(--mp-3)}
-.mp-pop .meta {margin-top:6px;font-size:13.5px;letter-spacing:.01em;color:var(--mp-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-pop .meta {margin-top:5px;font-size:12.5px;letter-spacing:.01em;color:var(--mp-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mp-pop .sub .artist {color:var(--mp-3);flex:0 0 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mp-pop .controls {display:flex;align-items:center;justify-content:center;gap:48px;margin-top:auto;margin-bottom:14px;padding:0;contain:layout paint style}
+.mp-pop .controls {display:flex;align-items:center;justify-content:center;gap:42px;margin-top:auto;margin-bottom:11px;padding:0;contain:layout paint style}
 .mp-pop .controls button {
-    display:grid;place-items:center;width:38px;height:38px;padding:0;border:0;background:none;
+    display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:none;
     color:var(--mp-ctrl);cursor:pointer;
     transition:transform 260ms cubic-bezier(.16,1.06,.3,1);
     will-change:transform;-webkit-tap-highlight-color:transparent;}
@@ -940,7 +940,7 @@ html[data-is-playing="true"] .mp-pop .eq i:nth-child(4) {animation-duration:.85s
 .mp-pop .controls button:active {transform:scale(.9);transition-duration:80ms;transition-timing-function:cubic-bezier(.3,.7,.4,1)}
 .mp-pop .controls button:disabled {opacity:.35;cursor:default}
 .mp-pop .controls button:focus-visible {outline:2px solid var(--mp-track);outline-offset:4px;border-radius:10px}
-.mp-pop .controls svg {grid-area:1/1;display:block;width:30px;height:30px;fill:currentColor;
+.mp-pop .controls svg {grid-area:1/1;display:block;width:26px;height:26px;fill:currentColor;
                 transform-origin:50% 50%;transform:translateZ(0);
                 transition:opacity 200ms cubic-bezier(.4,0,.2,1), transform 200ms cubic-bezier(.4,0,.2,1);
                 backface-visibility:hidden}
@@ -948,10 +948,10 @@ html[data-is-playing="true"] .mp-pop .eq i:nth-child(4) {animation-duration:.85s
 .mp-pop .controls .ico-pause {opacity:0;transform:scale(.74)}
 html[data-is-playing="true"] .mp-pop .controls .ico-play {opacity:0;transform:scale(.74)}
 html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:scale(1)}
-.mp-pop .controls button.big svg {width:34px;height:34px}
-.mp-pop .playhead {position:relative;height:5px;border-radius:2.5px;background:var(--mp-track);overflow:hidden}
+.mp-pop .controls button.big svg {width:30px;height:30px}
+.mp-pop .playhead {position:relative;height:4.5px;border-radius:2.25px;background:var(--mp-track);overflow:hidden}
 .mp-pop .playhead .inner {
-    position:absolute;left:0;top:0;height:100%;width:100%;border-radius:2.5px;background:var(--mp-fill);
+    position:absolute;left:0;top:0;height:100%;width:100%;border-radius:2.25px;background:var(--mp-fill);
     transform:translateX(-100%);will-change:transform;}
 .mp-pop .playhead.is-paused .inner {transition:transform 170ms linear}
 .mp-pop .playhead .inner.is-loading {
@@ -962,23 +962,28 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
 
 
 @media (max-width:684px) {
-  .mp-pop {--card-w:calc(100vw - 24px);--art:104px}
-  .mp-pop .card {gap:11px;padding:12px;border-radius:16px}
-  .mp-pop .col {min-height:112px;padding-top:2px}
-  .mp-pop .title {font-size:17px}
-  .mp-pop .sub {font-size:12px;gap:6px;margin-top:5px}
-  .mp-pop .meta {font-size:10.5px;margin-top:4px}
+  .mp-pop {--card-w:min(340px, calc(100vw - 24px));--art:92px}
+  .mp-pop .card {gap:10px;padding:11px;border-radius:15px}
+  .mp-pop .col {min-height:100px;padding-top:2px}
+  .mp-pop .title {font-size:16px}
+  .mp-pop .sub {font-size:11.5px;gap:6px;margin-top:5px}
+  .mp-pop .meta {font-size:10px;margin-top:4px}
   .mp-pop .eq {height:12px;gap:2px;margin-top:3px}
   .mp-pop .eq i {width:2px}
-  .mp-pop .controls {margin-bottom:9px;padding:0;gap:24px}
-  .mp-pop .controls button {width:29px;height:29px}
-  .mp-pop .controls svg {width:20px;height:20px}
-  .mp-pop .controls button.big svg {width:25px;height:25px}
+  .mp-pop .controls {margin-bottom:8px;padding:0;gap:20px}
+  .mp-pop .controls button {width:27px;height:27px}
+  .mp-pop .controls svg {width:18px;height:18px}
+  .mp-pop .controls button.big svg {width:23px;height:23px}
   .mp-pop .playhead {height:4px}
-  .mp-pop .badge img {height:9.5px}
+  .mp-pop .badge img {height:9px}
+  .mp-pop .times {font-size:11.5px;margin-top:8px}
   .mp-pop .art-col {gap:6px}
   .mp-pop .art .cover {font-size:10px;line-height:1.5;padding:0 8px}
 }
+/* 进度条下面的时间(保留):左已播 / 右剩余 */
+.mp-pop .times {display:flex;justify-content:space-between;margin-top:10px;font-size:14px;
+                color:var(--mp-3);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+
 .mp-pop .eq.is-live {align-items:center}
 .mp-pop .eq.is-live i {animation:none !important;
                 height:calc(var(--h, .12) * 100%) !important;
