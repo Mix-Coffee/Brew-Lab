@@ -26,8 +26,9 @@
       </div>
       <div class="artist-line">
         <span class="artist" data-music="artist">Blue Wednesday</span>
+        <span class="artist-sep" aria-hidden="true">·</span>
+        <span id="loopTag">30 秒试听</span>
       </div>
-      <div class="meta"><span id="loopTag">30 秒试听</span></div>
 
       <div class="controls">
         <button data-music="back" id="backBtn" aria-label="上一首" disabled>

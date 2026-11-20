@@ -927,10 +927,12 @@ html[data-is-playing="true"] .mp-pop .eq i:nth-child(4) {animation-duration:.85s
 @keyframes eq {from{height:18%}to{height:100%}}
 .mp-pop .sub {min-width:0;display:flex;align-items:baseline;gap:8px;margin-top:7px;font-size:14px;color:var(--mp-2);white-space:nowrap;overflow:hidden}
 .mp-pop .sub .album {min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mp-pop .meta {margin-top:5px;font-size:12.5px;letter-spacing:.01em;color:var(--mp-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* 第三行:作者名 */
-.mp-pop .artist-line {margin-top:3px;font-size:14px;color:var(--mp-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mp-pop .artist-line .artist {color:inherit}
+.mp-pop .artist-line {display:flex;align-items:baseline;gap:6px;margin-top:3px;font-size:14px;
+                      color:var(--mp-3);white-space:nowrap;overflow:hidden}
+.mp-pop .artist-line .artist {min-width:0;overflow:hidden;text-overflow:ellipsis;color:inherit}
+.mp-pop .artist-sep {color:var(--mp-3);opacity:.65}
+.mp-pop #loopTag {flex:0 0 auto;color:inherit}
 .mp-pop .controls {display:flex;align-items:center;justify-content:center;gap:42px;margin-top:auto;margin-bottom:11px;padding:0;contain:layout paint style}
 .mp-pop .controls button {
     display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;background:none;
@@ -963,31 +965,17 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
 
 
 @media (max-width:684px) {
-  .mp-pop {--card-w:min(340px, calc(100vw - 24px));--art:100px}
-  /* 手机端改成两段:上半「封面 + 文字」,下半「控件 + 进度条 + 时间」横跨整卡。
-     否则控件和进度条只挤在右栏,左下半整块空着,比例会失衡。 */
-  .mp-pop .card {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-rows: repeat(4, min-content) auto auto auto;
-    column-gap: 10px;
-    row-gap: 0;
-    align-items: start;
-    padding: 11px;
-    border-radius: 15px;
-  }
-  .mp-pop .art-col { grid-column: 1; grid-row: 1 / span 4; align-self: start; }
-  .mp-pop .col { display: contents; }        /* 让子元素直接进网格,控件才能跨整卡 */
-  .mp-pop .row-title { grid-column: 2; grid-row: 1; }
-  .mp-pop .sub { grid-column: 2; grid-row: 2; }
-  .mp-pop .artist-line { grid-column: 2; grid-row: 3; }
-  .mp-pop .meta { grid-column: 2; grid-row: 4; }
-  .mp-pop .controls { grid-column: 1 / -1; grid-row: 5; margin: 10px 0 8px; }
-  .mp-pop .playhead { grid-column: 1 / -1; grid-row: 6; }
-  .mp-pop .times { grid-column: 1 / -1; grid-row: 7; margin-top: 8px; }
+  .mp-pop {--card-w:min(340px, calc(100vw - 24px));--art:94px}
+  /* 手机端沿用桌面那套横排:封面在左,文字 / 控件 / 进度条 / 时间都在右栏,不做纵排 */
+  .mp-pop .card { gap: 10px; padding: 11px; border-radius: 15px; }
+  .mp-pop .col { min-height: 100px; padding-top: 2px; }
+  .mp-pop .controls { margin-bottom: 8px; padding: 0; gap: 20px; }
+  .mp-pop .times { font-size: 11.5px; margin-top: 8px; }
+  /* 这一行要塞下「作者 · 30 秒试听 · 6 首」:字号各压一档,实测刚好放得下,作者不被截 */
+  .mp-pop .artist-line { font-size: 11px; gap: 3px; }
+  .mp-pop #loopTag { font-size: 10px; }
   .mp-pop .title {font-size:16px}
   .mp-pop .sub {font-size:11.5px;gap:6px;margin-top:5px}
-  .mp-pop .meta {font-size:10px;margin-top:4px}
   .mp-pop .eq {height:12px;gap:2px;margin-top:3px}
   .mp-pop .eq i {width:2px}
   .mp-pop .controls button {width:27px;height:27px}
