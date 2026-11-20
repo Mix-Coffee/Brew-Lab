@@ -879,7 +879,9 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
     width:500px;            /* 基准尺寸,实际大小由 .mp-pop 的 --mp-zoom 缩放 */
     zoom:var(--mp-zoom,.9);
     display:flex;gap:17px;
-    padding:13px 13px 21px;   /* 底部多留 8px:Apple Music 徽标是绝对定位,贴在封面下面 */
+    /* 白边加宽并统一:上/左/右 17px,底部 25px。徽标是绝对定位挂在封面下方,
+       底部多出的 8px 正好抵掉徽标高度,让「徽标底到卡片底」也等于 17px */
+    padding:17px 17px 25px;
     border-radius:18px;
     background:rgba(255,255,255,.10);
     border:1px solid rgba(255,255,255,.16);
