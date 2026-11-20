@@ -919,8 +919,13 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
 .mp-pop .title {
     margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em;line-height:1.15;
     color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.mp-pop .eq {display:flex;align-items:flex-end;gap:3px;height:15px;flex:none;margin-top:4px;margin-right:16px}
-.mp-pop .eq i {display:block;width:2.5px;border-radius:2px;background:var(--mp-ctrl);height:40%}
+.mp-pop .eq {display:flex;align-items:flex-end;height:15px;flex:none;margin-top:4px;margin-right:16px;
+  /* 间距也用 zoom 抵消成整数(3px),这样 5 条的像素相位一致,粗细看起来才完全一样 */
+  gap:calc(3px / var(--mp-zoom))}
+.mp-pop .eq i {
+  /* 用 zoom 抵消:不管卡片缩放到多少,5 条在屏幕上都是整数 3px 宽,
+     否则 2.5px 乘上 zoom 变成 2.25px 这种小数,亚像素渲染会让粗细看着不一 */
+  display:block;width:calc(3px / var(--mp-zoom));border-radius:2px;background:var(--mp-ctrl);height:40%}
 .mp-pop .eq i:nth-child(2) {height:80%}
 .mp-pop .eq i:nth-child(3) {height:55%}
 .mp-pop .eq i:nth-child(4) {height:100%}
