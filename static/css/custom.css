@@ -1083,3 +1083,15 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
   .header__right .nav-back { margin-left: 7px; }
   .header__right .nav-fwd  { margin-left: 8px; }
 }
+
+/* ===== 文章页作者行 =====
+   front matter 的 author 单独占一行(渲染在「阅读时长」下面那一段):
+   - 行距:主题 .post-info p 是 margin .8em 0,作者行上边距收到 .15em,贴住上一行
+   - 图标间距:主题 .post-info svg 是 margin-right .8em(≈10px),作者行收到 .35em
+   改这两个数就能继续微调;当前值就在这里。 */
+.post-info .post-author {
+  margin: .15em 0 .8em;
+}
+.post-info .post-author svg {
+  margin-right: .35em;
+}

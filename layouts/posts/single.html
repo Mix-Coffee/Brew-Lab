@@ -12,30 +12,27 @@
             {{ i18n "readingTime" .Page.ReadingTime }}
           {{ end }}
 
-          {{- /* 站点覆盖:主题只在 <head> 的 meta 里用 .Params.author,页面正文不显示。
-                 这里把 front matter 的 author 显示出来;填 URL 的渲染成可点链接。
-                 另外主题原来用的是 .Date.Local(按构建机的本地时区渲染) —— 预览在 VM108 是 +08、
-                 Cloudflare 构建是 UTC,同一篇文章 19:37 会变成 11:37。改用 .Date,时区跟 front matter 走。 */ -}}
-          {{- with .Params.author }}
-            <span class="post-author">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              {{- if hasPrefix (string .) "http" }}
-                <a href="{{ . }}" target="_blank" rel="noopener">{{ . }}</a>
-              {{- else }}
-                {{ . }}
-              {{- end }}
-            </span>
-          {{- end }}
-
           {{ if .IsTranslated }} | {{ i18n "postAvailable" }}
             {{ range .Translations }}
                 <a href="{{ .Permalink }}"><span class="flag fi fi-{{ index $.Site.Data.langFlags (.Lang) }}"></span></a>
             {{ end}}
           {{ end }}
         </p>
+
+        {{- /* 站点覆盖:主题只在 <head> 的 meta 里用 .Params.author,正文不显示。
+               作者单独一行(另起一个 <p>),不跟阅读时长挤在同一行;行距与图标间距交给
+               static/css/custom.css 的 .post-info .post-author 规则。
+               主题原来用 .Date.Local(按构建机时区渲染):VM108 预览 +08、Cloudflare 构建 UTC,
+               同一篇 19:37 会显示成 11:37,这里改用 .Date。 */ -}}
+        {{- with .Params.author }}
+          <p class="post-author">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            {{- if hasPrefix (string .) "http" }}<a href="{{ . }}" target="_blank" rel="noopener">{{ . }}</a>{{ else }}{{ . }}{{ end }}
+          </p>
+        {{- end }}
       </div>
 
       <article>
