@@ -13,7 +13,7 @@
       <img id="coverImg" alt="" hidden>
       <div class="cover" id="cover">载入中…</div>
       </div>
-      <a class="badge" href="https://music.apple.com/cn/album/the-bigger-picture-ep/1669321650" target="_blank" rel="noopener noreferrer" aria-label="在 Apple Music 打开这张专辑"><img id="badgeMark" class="badge__mark" alt="Apple Music" src="/img/apple-mark-light.png"><img id="badgeWord" class="badge__word" alt="" aria-hidden="true" src="/img/apple-word-light.png"></a>
+      <a class="badge" href="https://music.apple.com/cn/album/the-bigger-picture-ep/1669321650" target="_blank" rel="noopener noreferrer" aria-label="在 Apple Music 打开这张专辑"><img id="badgeImg" alt="" src="/img/apple-badge-light.png"></a>
     </div>
 
     <div class="col">
@@ -79,8 +79,7 @@
       remaining: $('[data-music="remaining"]') || STUB,
       hintMsg: $('#hintMsg') || STUB,
       audio: $('#audio'),
-      badgeMark: $('#badgeMark'),
-    badgeWord: $('#badgeWord'),
+      badgeImg: $('#badgeImg'),
     };
 
     const VIDEO_URL = 'https://www.youtube.com/watch?v=7IjikRSGvAU';
@@ -108,15 +107,9 @@
     // 徽标跟着弹层底色走:浅色玻璃(浅色主题)上必须用深色字标,否则看不清
     const isLightTheme = () => document.documentElement.getAttribute('data-theme') === 'light';
     let lastArt = '';
-    // 苹果图形和字标是两个文件:图形单独放大一点,字标保持原尺寸
-    const setBadge = (svgBase) => {
-      const suffix = svgBase === BADGE_DARK ? 'dark' : 'light';
-      el.badgeMark.src = '/img/apple-mark-' + suffix + '.png';
-      el.badgeWord.src = '/img/apple-word-' + suffix + '.png';
-    };
     function setBadgeTone(src) {
       lastArt = src || lastArt;
-      if (isLightTheme()) { setBadge(BADGE_DARK); return; }
+      if (isLightTheme()) { el.badgeImg.src = BADGE_DARK; return; }
       const im = new Image();
       im.onload = () => {
         try {
@@ -125,10 +118,10 @@
           const d = g.getImageData(0, 0, 8, 8).data;
           let sum = 0;
           for (let i = 0; i < d.length; i += 4) sum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
-          setBadge((sum / (d.length / 4) > 130) ? BADGE_DARK : BADGE_LIGHT);
-          } catch (e) { setBadge(BADGE_LIGHT); }
-          };
-          im.onerror = () => { setBadge(BADGE_LIGHT); };
+          el.badgeImg.src = (sum / (d.length / 4) > 130) ? BADGE_DARK : BADGE_LIGHT;
+        } catch (e) { el.badgeImg.src = BADGE_LIGHT; }
+      };
+      im.onerror = () => { el.badgeImg.src = BADGE_LIGHT; };
       im.src = src;
     }
     function paintButtons() {
