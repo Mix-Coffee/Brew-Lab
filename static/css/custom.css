@@ -876,7 +876,8 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
 }
 .mp-pop .card {
     position:relative;
-    width:var(--card-w);
+    width:500px;            /* 基准尺寸,实际大小由 .mp-pop 的 --mp-zoom 缩放 */
+    zoom:var(--mp-zoom,.9);
     display:flex;gap:17px;
     padding:13px 13px 19px;   /* 底部多留 6px:Apple Music 徽标是绝对定位,贴在封面下面 */
     border-radius:18px;
@@ -972,27 +973,6 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
                 color:var(--mp-3);font-variant-numeric:tabular-nums;letter-spacing:.01em}
 
 @media (max-width:684px) {
-  .mp-pop {--card-w:min(340px, calc(100vw - 24px));--art:107px}
-  /* 手机端 = 桌面卡片整体缩放 0.68(340 / 500),所有尺寸按同比例换算,
-     比例、疏密、控件关系都和桌面版一致,不是另调的一套 */
-  .mp-pop .card { gap: 11.5px; padding: 9px 9px 13px; border-radius: 12px; }
-  .mp-pop .badge { top: calc(100% + 5.5px); }
-  .mp-pop .art-col { top: -5.5px; }
-  .mp-pop .badge img { height: 8px; }
-  .mp-pop .col { min-height: 120px; padding-top: 5px; }
-  .mp-pop .title { font-size: 13.6px; }
-  .mp-pop .eq { height: 10px; gap: 2px; margin-top: 2.7px; margin-right: 11px; }
-  .mp-pop .eq i { width: 1.7px; }
-  .mp-pop .sub { font-size: 9.5px; gap: 5.5px; margin-top: 5px; }
-  .mp-pop .artist-line { font-size: 9.5px; gap: 4px; margin-top: 2px; }
-  .mp-pop #loopTag { font-size: 9.5px; }
-  .mp-pop .controls { gap: 28.6px; margin-bottom: 7.5px; }
-  .mp-pop .controls button { width: 23px; height: 23px; }
-  .mp-pop .controls svg { width: 17.7px; height: 17.7px; }
-  .mp-pop .controls button.big svg { width: 20.4px; height: 20.4px; }
-  .mp-pop .playhead { height: 3px; border-radius: 1.5px; }
-  .mp-pop .times { font-size: 9.5px; margin-top: 7px; }
-  .mp-pop .art .cover { font-size: 8.5px; line-height: 1.5; padding: 0 6px; }
 }
 
 .mp-pop .eq.is-live {align-items:center}
@@ -1009,13 +989,18 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
 .mp-pop {
   position: fixed;
   z-index: 120;
+  --mp-zoom: .9;                        /* 桌面:基准 500 → 450,整体等比缩小 */
+  --card-w: calc(500px * var(--mp-zoom));
   width: var(--card-w);
   border-radius: 20px;
   corner-shape: superellipse(1.8);
   overflow: hidden;
   /* 毛玻璃:深色页面上用「白雾」而不是深色蒙版 —— 深色蒙版叠在近黑背景上等于看不见,
      所以改成 9% 白 + 24px 模糊 + 190% 饱和,顶部再加一道极淡的高光,才有玻璃的厚度感 */
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.115), rgba(255, 255, 255, 0.065));
+  /* 第一层是白色玻璃雾,第二层是封面提取出来的专辑强调色(JS 写入 --mp-tint-rgb) */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.115), rgba(255, 255, 255, 0.065)),
+    rgba(var(--mp-tint-rgb, 255, 255, 255), 0.26);
   -webkit-backdrop-filter: blur(24px) saturate(190%);
           backdrop-filter: blur(24px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -1034,10 +1019,16 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
   --mp-track: rgba(24, 24, 26, 0.16);
   --mp-fill: rgba(24, 24, 26, 0.84);
   --mp-ctrl: rgba(24, 24, 26, 0.82);
-  background: rgba(250, 250, 250, 0.60);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.58)),
+    rgba(var(--mp-tint-rgb, 250, 250, 250), 0.30);
   border-color: rgba(255, 255, 255, 0.7);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
 }
 /* 毛玻璃只做一层(在 .mp-pop 上),卡片自己那层背景/模糊关掉,避免两层模糊打架 */
 .mp-pop .card { position: relative; z-index: 1; background: transparent; border-color: transparent; box-shadow: none; }
 .mp-pop .card::before { display: none; }
+
+/* 手机尺寸:整卡 zoom 缩放,比例和桌面完全一致,不再单独写一套数值 */
+@media (max-width:684px) { .mp-pop { --mp-zoom: .732; } }   /* 390 屏 → 366px 宽(比原来 340 放大一档) */
+@media (max-width:380px) { .mp-pop { --mp-zoom: .68; } }    /* 320/360 窄屏 → 340px */

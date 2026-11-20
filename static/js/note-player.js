@@ -109,8 +109,10 @@
     let lastArt = '';
     function setBadgeTone(src) {
       lastArt = src || lastArt;
-      if (isLightTheme()) { el.badgeImg.src = BADGE_DARK; return; }
+      const light = isLightTheme();
+      el.badgeImg.src = light ? BADGE_DARK : BADGE_LIGHT;
       const im = new Image();
+      im.crossOrigin = 'anonymous';   // 不开 CORS,canvas 被污染就读不到像素(封面主机返回 *)
       im.onload = () => {
         try {
           const cv = document.createElement('canvas'); cv.width = cv.height = 8;
@@ -118,11 +120,33 @@
           const d = g.getImageData(0, 0, 8, 8).data;
           let sum = 0;
           for (let i = 0; i < d.length; i += 4) sum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
-          el.badgeImg.src = (sum / (d.length / 4) > 130) ? BADGE_DARK : BADGE_LIGHT;
-        } catch (e) { el.badgeImg.src = BADGE_LIGHT; }
+          if (!light) el.badgeImg.src = (sum / (d.length / 4) > 130) ? BADGE_DARK : BADGE_LIGHT;
+          applyTint(d);
+        } catch (e) { /* 读不到像素就保持默认中性玻璃 */ }
       };
-      im.onerror = () => { el.badgeImg.src = BADGE_LIGHT; };
       im.src = src;
+    }
+
+    // 从封面里取主色,写成 --mp-tint-rgb,毛玻璃底层铺这层强调色
+    function applyTint(d) {
+      const buckets = {}; let best = null;
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i + 3] < 160) continue;
+        const k = (d[i] >> 5) + ',' + (d[i + 1] >> 5) + ',' + (d[i + 2] >> 5);
+        const b = buckets[k] || (buckets[k] = { n: 0, r: 0, g: 0, b: 0 });
+        b.n++; b.r += d[i]; b.g += d[i + 1]; b.b += d[i + 2];
+        if (!best || b.n > best.n) best = b;
+      }
+      if (!best || !pop) return;
+      let r = best.r / best.n, g = best.g / best.n, bl = best.b / best.n;
+      const avg = (r + g + bl) / 3, boost = 1.4;    // 提饱和,偏灰的封面也能透出颜色
+      r  = Math.max(0, avg + (r  - avg) * boost);
+      g  = Math.max(0, avg + (g  - avg) * boost);
+      bl = Math.max(0, avg + (bl - avg) * boost);
+      // 再按最亮通道归一化:封面主色偏黑时按比例提亮,否则叠上去等于没有
+      const k = 190 / Math.max(r, g, bl, 1);
+      r = Math.min(255, r * k); g = Math.min(255, g * k); bl = Math.min(255, bl * k);
+      pop.style.setProperty('--mp-tint-rgb', (r | 0) + ', ' + (g | 0) + ', ' + (bl | 0));
     }
     function paintButtons() {
       const has = state.list.length > 0;
