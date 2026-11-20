@@ -43,11 +43,6 @@
       <div class="playhead" id="playhead" aria-hidden="true">
         <div class="inner" id="inner"></div>
       </div>
-
-      <div class="times">
-        <span data-music="elapsed">00:00</span>
-        <span data-music="remaining">-00:00</span>
-      </div>
     </div>
   </div>`;
 
@@ -56,6 +51,7 @@
   function startPlayer() {
     'use strict';
     const $ = (s, r = pop) => r.querySelector(s);
+    const STUB = { textContent: '' };   // 时间行/提示行已删,写入时走空壳
     const el = {
       html: document.documentElement,
       card: $('#card'),
@@ -71,9 +67,9 @@
       forward: $('#nextBtn'),
       playhead: $('#playhead'),
       inner: $('#inner'),
-      elapsed: $('[data-music="elapsed"]'),
-      remaining: $('[data-music="remaining"]'),
-      hintMsg: $('#hintMsg'),
+      elapsed: $('[data-music="elapsed"]') || STUB,
+      remaining: $('[data-music="remaining"]') || STUB,
+      hintMsg: $('#hintMsg') || STUB,
       audio: $('#audio'),
       badgeImg: $('#badgeImg'),
     };
@@ -100,7 +96,12 @@
       if (el.hintMsg.textContent === msg) return;
       el.hintMsg.textContent = msg;
     }
+    // 徽标跟着弹层底色走:浅色玻璃(浅色主题)上必须用深色字标,否则看不清
+    const isLightTheme = () => document.documentElement.getAttribute('data-theme') === 'light';
+    let lastArt = '';
     function setBadgeTone(src) {
+      lastArt = src || lastArt;
+      if (isLightTheme()) { el.badgeImg.src = BADGE_DARK; return; }
       const im = new Image();
       im.onload = () => {
         try {
@@ -344,8 +345,12 @@
       if (eqRAF) { cancelAnimationFrame(eqRAF); eqRAF = 0; }
       eqIdle();
     }
-    eqEl.classList.add('is-live');   // 先停掉固定动画，等真正播放再驱动
+    eqEl.classList.add('is-live');   // 先停掉固定动画,等真正播放再驱动
     eqIdle();
+
+    // 切换深浅主题时重算徽标配色
+    new MutationObserver(() => { if (lastArt) setBadgeTone(lastArt); })
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     /* ---------- 启动：拉 Apple 的试听 ---------- */
     (async function boot() {
@@ -386,9 +391,7 @@
     pop.id = 'notePlayer';
     pop.setAttribute('role', 'dialog');
     pop.setAttribute('aria-label', '迷你播放器');
-    pop.innerHTML = CARD
-      + '<p class="hint"><span id="hintMsg">Apple Music 30 秒在线试听</span></p>'
-      + '<audio id="audio" preload="auto" crossorigin="anonymous"></audio>';
+    pop.innerHTML = CARD + '<audio id="audio" preload="auto" crossorigin="anonymous"></audio>';
     document.body.appendChild(pop);
   }
 
