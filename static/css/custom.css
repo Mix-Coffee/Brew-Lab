@@ -510,7 +510,8 @@ nav.menu a.dropbtn {
   display: block;
   margin: 0;
   padding: 7px 13px;
-  border-radius: 8px;
+  border-radius: 14px;   /* 外框 20 - 内边距 6,内圆角跟着外框走才不打架 */
+  corner-shape: superellipse(1.8);   /* 和外框同一种超椭圆,同心才看不出来 */
   text-decoration: none;
   transition: background-color var(--dur-fast) ease-out;
 }
