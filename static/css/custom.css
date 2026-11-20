@@ -915,7 +915,7 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
 .mp-pop .title {
     margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em;line-height:1.15;
     color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.mp-pop .eq {display:flex;align-items:flex-end;gap:3px;height:15px;flex:none;margin-top:4px;margin-right:4px}
+.mp-pop .eq {display:flex;align-items:flex-end;gap:3px;height:15px;flex:none;margin-top:4px;margin-right:16px}
 .mp-pop .eq i {display:block;width:2.5px;border-radius:2px;background:var(--mp-ctrl);height:40%}
 .mp-pop .eq i:nth-child(2) {height:80%}
 .mp-pop .eq i:nth-child(3) {height:55%}
