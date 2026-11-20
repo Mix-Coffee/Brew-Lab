@@ -964,32 +964,32 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
 @keyframes shimmer {from{background-position:0 0}to{background-position:-200% 0}}
 
 
-@media (max-width:684px) {
-  .mp-pop {--card-w:min(340px, calc(100vw - 24px));--art:94px}
-  /* 手机端沿用桌面那套横排:封面在左,文字 / 控件 / 进度条 / 时间都在右栏,不做纵排 */
-  .mp-pop .card { gap: 10px; padding: 11px; border-radius: 15px; }
-  .mp-pop .col { min-height: 100px; padding-top: 2px; }
-  .mp-pop .controls { margin-bottom: 8px; padding: 0; gap: 20px; }
-  .mp-pop .times { font-size: 11.5px; margin-top: 8px; }
-  /* 这一行要塞下「作者 · 30 秒试听 · 6 首」:字号各压一档,实测刚好放得下,作者不被截 */
-  .mp-pop .artist-line { font-size: 11px; gap: 3px; }
-  .mp-pop #loopTag { font-size: 10px; }
-  .mp-pop .title {font-size:16px}
-  .mp-pop .sub {font-size:11.5px;gap:6px;margin-top:5px}
-  .mp-pop .eq {height:12px;gap:2px;margin-top:3px}
-  .mp-pop .eq i {width:2px}
-  .mp-pop .controls button {width:27px;height:27px}
-  .mp-pop .controls svg {width:18px;height:18px}
-  .mp-pop .controls button.big svg {width:23px;height:23px}
-  .mp-pop .playhead {height:4px}
-  .mp-pop .badge img {height:9px}
-  .mp-pop .times {font-size:11.5px}
-  .mp-pop .art-col {gap:6px}
-  .mp-pop .art .cover {font-size:10px;line-height:1.5;padding:0 8px}
-}
 /* 进度条下面的时间(保留):左已播 / 右剩余 */
 .mp-pop .times {display:flex;justify-content:space-between;margin-top:10px;font-size:14px;
                 color:var(--mp-3);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+
+@media (max-width:684px) {
+  .mp-pop {--card-w:min(340px, calc(100vw - 24px));--art:107px}
+  /* 手机端 = 桌面卡片整体缩放 0.68(340 / 500),所有尺寸按同比例换算,
+     比例、疏密、控件关系都和桌面版一致,不是另调的一套 */
+  .mp-pop .card { gap: 11.5px; padding: 9px; border-radius: 12px; }
+  .mp-pop .art-col { gap: 5.5px; }
+  .mp-pop .badge img { height: 8px; }
+  .mp-pop .col { min-height: 120px; padding-top: 5px; }
+  .mp-pop .title { font-size: 13.6px; }
+  .mp-pop .eq { height: 10px; gap: 2px; margin-top: 2.7px; margin-right: 11px; }
+  .mp-pop .eq i { width: 1.7px; }
+  .mp-pop .sub { font-size: 9.5px; gap: 5.5px; margin-top: 5px; }
+  .mp-pop .artist-line { font-size: 9.5px; gap: 4px; margin-top: 2px; }
+  .mp-pop #loopTag { font-size: 9.5px; }
+  .mp-pop .controls { gap: 28.6px; margin-bottom: 7.5px; }
+  .mp-pop .controls button { width: 23px; height: 23px; }
+  .mp-pop .controls svg { width: 17.7px; height: 17.7px; }
+  .mp-pop .controls button.big svg { width: 20.4px; height: 20.4px; }
+  .mp-pop .playhead { height: 3px; border-radius: 1.5px; }
+  .mp-pop .times { font-size: 9.5px; margin-top: 7px; }
+  .mp-pop .art .cover { font-size: 8.5px; line-height: 1.5; padding: 0 6px; }
+}
 
 .mp-pop .eq.is-live {align-items:center}
 .mp-pop .eq.is-live i {animation:none !important;
