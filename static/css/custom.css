@@ -664,12 +664,14 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
    ============================================================ */
 @media (max-width: 684px) {
   /* 切换图标排在汉堡左侧。.header__right 是 row-reverse,order 越小越靠右 */
-  .header__right .theme-toggle { order: 2; margin-right: 15px; margin-left: 0; }
-  .header__right .header-note  { order: 1; margin-right: 13.5px; margin-left: 0; }
+  .header__right .theme-toggle { order: 2; margin-right: 8px; margin-left: 0; }
+  .header__right .header-note  { order: 1; margin-right: 8px; margin-left: 0; }
   .header__right .menu-trigger { order: 0; margin-left: 4px; }
-  /* 手机上顶栏塞不下五个图标(390/360 都会顶出视口),先隐藏;
-     移动端本来就能用系统返回手势,照样走 popstate 局部切换 */
-  .header__right .nav-arrow { display: none; }
+  /* 五个图标要塞得下:箭头做小一点,间距收紧(390 屏总宽 136.4,logo 220.8,合计 357.2 < 358) */
+  .header__right .nav-arrow { width: 16px; height: 16px; }
+  .header__right .nav-arrow svg { width: 16px; height: 16px; stroke-width: 2.4; }
+  .header__right .nav-back { order: -1; margin-left: 6px; }
+  .header__right .nav-fwd  { order: -2; margin-left: 8px; }
 }
 
 /* 尊重系统的"减弱动态效果" */
@@ -1063,3 +1065,8 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
 /* 手机尺寸:整卡 zoom 缩放,比例和桌面完全一致,不再单独写一套数值 */
 @media (max-width:684px) { .mp-pop { --mp-zoom: .732; } }   /* 390 屏 → 366px 宽(比原来 340 放大一档) */
 @media (max-width:380px) { .mp-pop { --mp-zoom: .68; } }    /* 320/360 窄屏 → 340px */
+
+/* 窄屏(<=380)顶栏要塞五个图标,logo 字号收一档;放文件末尾才盖得住前面的 16px */
+@media (max-width: 380px) {
+  .header .logo__text { font-size: 13px; letter-spacing: 0.1px; }
+}

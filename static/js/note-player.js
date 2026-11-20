@@ -504,10 +504,12 @@
   var navIdx = (history.state && typeof history.state.idx === 'number') ? history.state.idx : 0;
   var navMax = navIdx;   // 本次加载最多走到第几层,用来判断「前进」能不能点
 
+  // 置灰只是视觉提示,点击永远放行:浏览器历史里可能还有我们 index 之外
+  // 的条目(从别的站进来、刷新过),按 idx 拦截会让按钮「点了没反应」
   function paintArrows() {
     var b = document.querySelector('.nav-back'), f = document.querySelector('.nav-fwd');
-    if (b) b.classList.toggle('is-off', navIdx <= 0);
-    if (f) f.classList.toggle('is-off', navIdx >= navMax);
+    if (b) b.classList.toggle('is-off', history.length <= 1);
+    if (f) f.classList.toggle('is-off', navMax > 0 && navIdx >= navMax);
   }
 
   function wireArrows() {
@@ -519,8 +521,8 @@
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (can()) run(); }
       });
     }
-    act(b, function () { return navIdx > 0; }, function () { history.back(); });
-    act(f, function () { return navIdx < navMax; }, function () { history.forward(); });
+    act(b, function () { return true; }, function () { history.back(); });
+    act(f, function () { return true; }, function () { history.forward(); });
     paintArrows();
   }
 
