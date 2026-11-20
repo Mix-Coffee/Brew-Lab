@@ -878,7 +878,7 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
     position:relative;
     width:var(--card-w);
     display:flex;gap:17px;
-    padding:13px;
+    padding:13px 13px 19px;   /* 底部多留 6px:Apple Music 徽标是绝对定位,贴在封面下面 */
     border-radius:18px;
     background:rgba(255,255,255,.10);
     border:1px solid rgba(255,255,255,.16);
@@ -902,9 +902,12 @@ body:not(.home) .footer__content a { color: rgba(46, 32, 24, .72); }
     color:rgba(255,255,255,.9);font-size:12.5px;line-height:1.7;
     transition:opacity var(--t);}
 .mp-pop .art .cover.is-hidden {opacity:0;pointer-events:none}
-.mp-pop .art-col {display:flex;flex-direction:column;align-items:center;gap:8px;flex:none}
+/* 封面居中跟右栏中心对齐:徽标绝对定位到封面下方,不参与排版,
+   否则封面会被徽标顶上去,视觉中心比右栏高 10px */
+.mp-pop .art-col {position:relative;display:flex;flex-direction:column;align-items:center;align-self:center;flex:none}
 .mp-pop .badge {
-    position:static;display:block;line-height:0;
+    position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%);
+    display:block;line-height:0;
     text-decoration:none;cursor:pointer;
     transition:opacity var(--t);}
 .mp-pop .badge:hover {opacity:.78}
@@ -972,8 +975,8 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
   .mp-pop {--card-w:min(340px, calc(100vw - 24px));--art:107px}
   /* 手机端 = 桌面卡片整体缩放 0.68(340 / 500),所有尺寸按同比例换算,
      比例、疏密、控件关系都和桌面版一致,不是另调的一套 */
-  .mp-pop .card { gap: 11.5px; padding: 9px; border-radius: 12px; }
-  .mp-pop .art-col { gap: 5.5px; }
+  .mp-pop .card { gap: 11.5px; padding: 9px 9px 13px; border-radius: 12px; }
+  .mp-pop .badge { top: calc(100% + 5.5px); }
   .mp-pop .badge img { height: 8px; }
   .mp-pop .col { min-height: 120px; padding-top: 5px; }
   .mp-pop .title { font-size: 13.6px; }
@@ -1009,12 +1012,12 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
   border-radius: 20px;
   corner-shape: superellipse(1.8);
   overflow: hidden;
-  /* 和三横菜单同一套毛玻璃:同样的模糊强度/描边/投影,只把底色换成深色玻璃,
-     因为卡片里的字全是白的,浅色玻璃会读不清 */
-  background: rgba(27, 28, 29, 0.76);
-  -webkit-backdrop-filter: blur(14px) saturate(165%);
-          backdrop-filter: blur(14px) saturate(165%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  /* 毛玻璃:深色页面上用「白雾」而不是深色蒙版 —— 深色蒙版叠在近黑背景上等于看不见,
+     所以改成 9% 白 + 24px 模糊 + 190% 饱和,顶部再加一道极淡的高光,才有玻璃的厚度感 */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.115), rgba(255, 255, 255, 0.065));
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+          backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
   opacity: 0;
   transform: translateY(-8px) scale(.985);
@@ -1030,8 +1033,8 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
   --mp-track: rgba(24, 24, 26, 0.16);
   --mp-fill: rgba(24, 24, 26, 0.84);
   --mp-ctrl: rgba(24, 24, 26, 0.82);
-  background: rgba(250, 250, 250, 0.78);
-  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(250, 250, 250, 0.60);
+  border-color: rgba(255, 255, 255, 0.7);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
 }
 /* 毛玻璃只做一层(在 .mp-pop 上),卡片自己那层背景/模糊关掉,避免两层模糊打架 */
