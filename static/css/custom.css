@@ -586,6 +586,20 @@ nav.menu .submenu .dropdown.open .dropdown-content {
 nav.menu .menu__inner > li,
 nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease-out-quart) both; }
 
+/* 上一级 / 下一级 箭头:尺寸/线宽/状态(顶层,手机桌面共用;只把 order 放进各自的媒体查询) */
+.header__right .nav-arrow {
+  display: block; width: 24px; height: 24px; cursor: pointer;
+  flex: 0 0 auto;   /* 别让 flex 把箭头挤成 0 宽 */
+  transition: opacity var(--dur-fast) ease-out, transform var(--dur-fast) ease-out;
+}
+.header__right .nav-arrow svg {
+  display: block; width: 24px; height: 24px; fill: none;
+  stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.header__right .nav-arrow:active { transform: scale(.88); }
+.header__right .nav-arrow.is-off { opacity: .22; cursor: default; }
+.header__right .nav-arrow:not(.is-off):hover { opacity: .72; }
+
 /* ============================================================
    桌面端:深浅切换图标排在汉堡(三横)左侧,并留出间隔
    .header__right 在桌面是 flex-direction: row,order 越小越靠左,
@@ -597,20 +611,9 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
   .header__right .header-note  { order: 2; margin-right: 13.5px; margin-left: 0; }
   .header__right .menu-trigger { order: 3; }
 
-/* 后退 / 前进:排在三横右边 */
-.header__right .nav-arrow {
-  display: block; width: 24px; height: 24px; cursor: pointer;
-  transition: opacity var(--dur-fast) ease-out, transform var(--dur-fast) ease-out;
-}
-.header__right .nav-arrow svg {
-  display: block; width: 24px; height: 24px; fill: none;
-  stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-}
-.header__right .nav-back { order: 4; margin-left: 13.5px; }
-.header__right .nav-fwd  { order: 5; margin-left: 16px; }
-.header__right .nav-arrow:active { transform: scale(.88); }
-.header__right .nav-arrow.is-off { opacity: .22; cursor: default; }
-.header__right .nav-arrow:not(.is-off):hover { opacity: .72; }
+  /* 后退 / 前进:排在三横右边 */
+  .header__right .nav-back { order: 4; margin-left: 13.5px; }
+  .header__right .nav-fwd  { order: 5; margin-left: 16px; }
 }
 
 /* 汉堡图标按下的回弹 */
@@ -668,8 +671,6 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
   .header__right .header-note  { order: 1; margin-right: 8px; margin-left: 0; }
   .header__right .menu-trigger { order: 0; margin-left: 4px; }
   /* 五个图标要塞得下:箭头做小一点,间距收紧(390 屏总宽 136.4,logo 220.8,合计 357.2 < 358) */
-  .header__right .nav-arrow { width: 16px; height: 16px; }
-  .header__right .nav-arrow svg { width: 16px; height: 16px; stroke-width: 2.4; }
   .header__right .nav-back { order: -1; margin-left: 6px; }
   .header__right .nav-fwd  { order: -2; margin-left: 8px; }
 }
@@ -1067,6 +1068,14 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
 @media (max-width:380px) { .mp-pop { --mp-zoom: .68; } }    /* 320/360 窄屏 → 340px */
 
 /* 窄屏(<=380)顶栏要塞五个图标,logo 字号收一档;放文件末尾才盖得住前面的 16px */
-@media (max-width: 380px) {
-  .header .logo__text { font-size: 13px; letter-spacing: 0.1px; }
+/* 五个图标保持桌面尺寸不变,靠收 logo 字号腾地方 */
+@media (max-width: 420px) { .header .logo__text { font-size: 14px; letter-spacing: 0.15px; } }
+@media (max-width: 380px) { .header .logo__text { font-size: 12px; letter-spacing: 0.1px; } }
+@media (max-width: 340px) {
+  .header .logo__text { font-size: 10.5px; }
+  .header__right .nav-arrow { width: 20px; height: 20px; }
+  .header__right .nav-arrow svg { width: 20px; height: 20px; }
+  .header__right .theme-toggle, .header__right .header-note { margin-right: 6px; }
+  .header__right .nav-back { margin-left: 4px; }
+  .header__right .nav-fwd  { margin-left: 6px; }
 }

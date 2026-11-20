@@ -501,19 +501,39 @@
      这里拦住站内链接,fetch 新页面后只把 .container 里的内容换掉:
      header(菜单/主题切换的绑定)和 body 上的播放器都原地保留,
      音频元素没有被销毁,所以可以一直播。 */
-  var navIdx = (history.state && typeof history.state.idx === 'number') ? history.state.idx : 0;
-  var navMax = navIdx;   // 本次加载最多走到第几层,用来判断「前进」能不能点
+  /* 上一级 / 下一级:走博客自己的层级,不是浏览器的历史
+       - 上一级:文章 → 文章列表(/posts/) → 首页(/)
+       - 下一级:只有按过「上一级」之后才亮,作用是回到你刚离开的那一页 */
+  var upStack = [];   // 按过「上一级」时记下离开的页面
 
-  // 置灰只是视觉提示,点击永远放行:浏览器历史里可能还有我们 index 之外
-  // 的条目(从别的站进来、刷新过),按 idx 拦截会让按钮「点了没反应」
+  function parentPath(p) {
+    if (!p || p === '/') return null;                               // 首页没有上一级
+    var segs = p.split('/').filter(Boolean);
+    if (segs.length > 1 && segs[0] === 'posts') return '/posts/';    // 文章 → 文章列表
+    return '/';                                                      // 其他页面 → 首页
+  }
+
   function paintArrows() {
-    var b = document.querySelector('.nav-back'), f = document.querySelector('.nav-fwd');
-    if (b) b.classList.toggle('is-off', history.length <= 1);
-    if (f) f.classList.toggle('is-off', navMax > 0 && navIdx >= navMax);
+    var up = document.querySelector('.nav-back'), dn = document.querySelector('.nav-fwd');
+    if (up) up.classList.toggle('is-off', !parentPath(location.pathname));
+    if (dn) dn.classList.toggle('is-off', upStack.length === 0);
+  }
+
+  function goUp() {
+    var to = parentPath(location.pathname);
+    if (!to) return;
+    upStack.push(location.pathname);
+    pjaxGo(to, true, '');
+    paintArrows();
+  }
+
+  function goDown() {
+    if (!upStack.length) return;
+    pjaxGo(upStack.pop(), true, '');
+    paintArrows();
   }
 
   function wireArrows() {
-    var b = document.querySelector('.nav-back'), f = document.querySelector('.nav-fwd');
     function act(el, can, run) {
       if (!el) return;
       el.addEventListener('click', function () { if (can()) run(); });
@@ -521,8 +541,8 @@
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (can()) run(); }
       });
     }
-    act(b, function () { return true; }, function () { history.back(); });
-    act(f, function () { return true; }, function () { history.forward(); });
+    act(document.querySelector('.nav-back'), function () { return !!parentPath(location.pathname); }, goUp);
+    act(document.querySelector('.nav-fwd'), function () { return upStack.length > 0; }, goDown);
     paintArrows();
   }
 
@@ -561,9 +581,7 @@
         if (!swapInto(doc)) throw new Error('no container');
         document.title = doc.title || document.title;
         if (push) {
-          navIdx++;
-          if (navIdx > navMax) navMax = navIdx;
-          history.pushState({ pjax: 1, idx: navIdx }, '', href);
+          history.pushState({ pjax: 1 }, '', href);
           paintArrows();
         }
         if (hash) {
@@ -594,10 +612,11 @@
           return;
         }
         e.preventDefault();
+        upStack.length = 0;                    // 自己点了别的页面,「下一级」失效
         pjaxGo(a.href, true, a.hash);
     });
-    window.addEventListener('popstate', function (e) {
-      navIdx = (e.state && typeof e.state.idx === 'number') ? e.state.idx : 0;
+    window.addEventListener('popstate', function () {
+      upStack.length = 0;                    // 浏览器自己走的历史不参与「下一级」
       paintArrows();
       pjaxGo(location.href, false, location.hash);
     });
