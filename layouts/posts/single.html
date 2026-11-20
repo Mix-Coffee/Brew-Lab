@@ -13,7 +13,9 @@
           {{ end }}
 
           {{- /* 站点覆盖:主题只在 <head> 的 meta 里用 .Params.author,页面正文不显示。
-                 这里把 front matter 的 author 显示出来;填 URL 的渲染成可点链接。 */ -}}
+                 这里把 front matter 的 author 显示出来;填 URL 的渲染成可点链接。
+                 另外主题原来用的是 .Date.Local(按构建机的本地时区渲染) —— 预览在 VM108 是 +08、
+                 Cloudflare 构建是 UTC,同一篇文章 19:37 会变成 11:37。改用 .Date,时区跟 front matter 走。 */ -}}
           {{- with .Params.author }}
             <span class="post-author">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
@@ -102,17 +104,17 @@
             <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
           {{ if .Site.Params.dateformNumTime }}
-            {{ dateFormat .Site.Params.dateformNumTime .Date.Local }}
+            {{ dateFormat .Site.Params.dateformNumTime .Date }}
           {{ else }}
-            {{ dateFormat "2006-01-02 15:04" .Date.Local }}
+            {{ dateFormat "2006-01-02 15:04" .Date }}
           {{ end }}
 
           {{ if .Lastmod }} 
             {{ if not (eq .Lastmod .Date )}}
               {{ if .Site.Params.dateformNumTime }}
-                ({{ i18n "lastModified" }}: {{ dateFormat .Site.Params.dateformNumTime .Lastmod.Local }})
+                ({{ i18n "lastModified" }}: {{ dateFormat .Site.Params.dateformNumTime .Lastmod }})
               {{ else }} 
-                ({{ i18n "lastModified" }}: {{ dateFormat "2006-01-02 15:04" .Lastmod.Local }})
+                ({{ i18n "lastModified" }}: {{ dateFormat "2006-01-02 15:04" .Lastmod }})
               {{ end }}
             {{ end }}
           {{ end }}
