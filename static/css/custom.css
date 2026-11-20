@@ -466,7 +466,7 @@ html[data-theme="dark"] { background-color: #000000; }   /* data-theme 就挂在
 /* 弹出的菜单卡片 */
 nav.menu {
   position: absolute;
-  top: 78px;   /* 顶栏高 70.8,留 7px 间隙,别压在顶栏上 */
+  top: 57px;   /* 和音乐控件弹层同一条顶线(音符图标底 + 10) */
   right: 10px;
   left: auto;
   z-index: 9999;
