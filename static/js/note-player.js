@@ -430,8 +430,18 @@
   function place() {
     if (!pop || !trigger) return;
     var r = trigger.getBoundingClientRect();
-    var w = pop.offsetWidth || 0;
     var vw = window.innerWidth;
+    var hd = document.querySelector('.header') || document.querySelector('header');
+    var pad = hd ? (parseFloat(getComputedStyle(hd).paddingLeft) || 16) : 16;
+    // 手机端:卡片宽度取导航栏内容宽度(视口 - 左右 padding),左右两侧和导航栏齐平
+    if (vw <= 684) {
+      var mw = Math.max(240, vw - pad * 2);
+      pop.style.setProperty('--mp-zoom', (mw / 500).toFixed(4));
+      pop.style.top = Math.round(r.bottom + 8) + 'px';
+      pop.style.right = Math.round(pad) + 'px';
+      return;
+    }
+    var w = pop.offsetWidth || 0;
     var right = vw - r.right;
     var maxRight = vw - w - 12;
     if (right > maxRight) right = maxRight;

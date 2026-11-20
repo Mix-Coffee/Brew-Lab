@@ -971,6 +971,8 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
 /* 进度条下面的时间(保留):左已播 / 右剩余 */
 .mp-pop .times {display:flex;justify-content:space-between;margin-top:10px;font-size:14px;
                 color:var(--mp-3);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+/* 按钮 / 进度条 / 时间这一组整体下移 10px:纯视觉位移,卡片高度和封面对位都不动 */
+.mp-pop .controls, .mp-pop .playhead, .mp-pop .times {transform:translateY(10px)}
 
 @media (max-width:684px) {
 }
@@ -1000,7 +1002,7 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
   /* 第一层是白色玻璃雾,第二层是封面提取出来的专辑强调色(JS 写入 --mp-tint-rgb) */
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.115), rgba(255, 255, 255, 0.065)),
-    rgba(var(--mp-tint-rgb, 255, 255, 255), 0.26);
+    rgba(var(--mp-tint-rgb, 255, 255, 255), 0.18);
   -webkit-backdrop-filter: blur(24px) saturate(190%);
           backdrop-filter: blur(24px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -1021,7 +1023,7 @@ html[data-is-playing="true"] .mp-pop .controls .ico-pause {opacity:1;transform:s
   --mp-ctrl: rgba(24, 24, 26, 0.82);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.58)),
-    rgba(var(--mp-tint-rgb, 250, 250, 250), 0.30);
+    rgba(var(--mp-tint-rgb, 250, 250, 250), 0.68);
   border-color: rgba(255, 255, 255, 0.7);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
 }
