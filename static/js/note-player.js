@@ -146,7 +146,7 @@
       // 再按最亮通道归一化:封面主色偏黑时按比例提亮,否则叠上去等于没有
       const k = 190 / Math.max(r, g, bl, 1);
       r = Math.min(255, r * k); g = Math.min(255, g * k); bl = Math.min(255, bl * k);
-      pop.style.setProperty('--mp-tint-rgb', (r | 0) + ', ' + (g | 0) + ', ' + (bl | 0));
+      document.documentElement.style.setProperty('--mp-tint-rgb', (r | 0) + ', ' + (g | 0) + ', ' + (bl | 0));
     }
     function paintButtons() {
       const has = state.list.length > 0;
@@ -463,8 +463,7 @@
     open = false;
     pop.classList.remove('is-open');
     trigger.setAttribute('aria-expanded', 'false');
-    var a = pop.querySelector('#audio');
-    if (a) a.pause();
+    // 关闭弹层不停播放:音乐继续放,再点开还是同一个状态
   }
 
   function togglePop() { open ? closePop() : openPop(); }
