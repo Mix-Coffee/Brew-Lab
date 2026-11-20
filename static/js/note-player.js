@@ -23,6 +23,8 @@
       </div>
       <div class="sub">
         <span class="album" data-music="album">The Bigger Picture - EP</span>
+      </div>
+      <div class="artist-line">
         <span class="artist" data-music="artist">Blue Wednesday</span>
       </div>
       <div class="meta"><span id="loopTag">30 秒试听</span></div>
