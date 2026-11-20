@@ -2,6 +2,14 @@ baseURL = "https://brew-lab-studio.pages.dev"
 title   = "Brew-Lab"
 locale = "zh-CN"
 
+# 未显式设置时 Hugo 按 UTC 渲染日期,文章里写的 +08:00 会被减 8 小时显示
+# (实测 2026-11-20T19:30+08:00 在页面上显示成 11:30)。固定为北京时间。
+timeZone = "Asia/Shanghai"
+
+# 中文没有空格,Hugo 默认按空格分词 → 一篇 5700 字的文章只算成个位数的"词",
+# 阅读时长显示成 1 分钟。开启后按字计数(wordCount ≈ 汉字数)。
+hasCJKLanguage = true
+
 # 单语言站点,但需显式声明默认语言,否则 <html lang="en"> 会把中文页标成英语
 # (影响搜索引擎语言判定与读屏软件发音)
 defaultContentLanguage = "zh-cn"   # 语言名必须全小写,否则 Hugo 拒绝启动
