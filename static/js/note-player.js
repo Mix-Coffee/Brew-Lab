@@ -493,6 +493,69 @@
     });
     window.addEventListener('resize', function () { syncMenuPos(); if (open) place(); });
     syncMenuPos();
+    wireNav();
+  }
+
+  /* ---------- 站内跳转改成局部替换,音乐不中断 ----------
+     静态站每次点链接都是整页重载,<audio> 会被销毁 → 播放停掉。
+     这里拦住站内链接,fetch 新页面后只把 .container 里的内容换掉:
+     header(菜单/主题切换的绑定)和 body 上的播放器都原地保留,
+     音频元素没有被销毁,所以可以一直播。 */
+  function isInternalLink(a) {
+    if (!a || a.target === '_blank' || a.hasAttribute('download')) return false;
+    var href = a.getAttribute('href');
+    if (!href || href.charAt(0) === '#' || /^(mailto|tel|javascript):/i.test(href)) return false;
+    var u;
+    try { u = new URL(a.href, location.href); } catch (e) { return false; }
+    if (u.origin !== location.origin) return false;
+    if (u.pathname === location.pathname && u.search === location.search) return false;  // 同页(含锚点)
+    return true;
+  }
+
+  function swapInto(doc) {
+    var oldC = document.querySelector('.container');
+    var newC = doc.querySelector('.container');
+    if (!oldC || !newC) return false;
+    var header = oldC.querySelector(':scope > header');
+    if (!header) return false;
+    while (oldC.firstChild) oldC.removeChild(oldC.firstChild);
+    oldC.appendChild(header);          // 顶栏原地保留,菜单/主题切换不用重建
+    Array.prototype.slice.call(newC.children).forEach(function (el) {   // 先拍快照:搬走节点会让 live HTMLCollection 收缩
+      var tag = el.tagName.toLowerCase();
+      if (tag === 'header' || tag === 'script' || tag === 'style') return;
+      oldC.appendChild(el);
+    });
+    document.body.className = doc.body.className;   // 首页 body.home 这类类名要跟着换
+    return true;
+  }
+
+  function pjaxGo(href, push, hash) {
+    fetch(href, { credentials: 'same-origin' })
+      .then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.text(); })
+      .then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        if (!swapInto(doc)) throw new Error('no container');
+        document.title = doc.title || document.title;
+        if (push) history.pushState({ pjax: 1 }, '', href);
+        if (hash) {
+          var t = document.getElementById(hash.slice(1));
+          if (t) { t.scrollIntoView(); return; }
+        }
+        window.scrollTo(0, 0);
+        if (window.Prism && window.Prism.highlightAll) { try { Prism.highlightAll(); } catch (e) {} }
+      })
+      .catch(function () { location.href = href; });   // 出错就退回整页跳转
+  }
+
+  function wireNav() {
+    document.addEventListener('click', function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest ? e.target.closest('a') : null;
+      if (!isInternalLink(a)) return;
+      e.preventDefault();
+      pjaxGo(a.href, true, a.hash);
+    });
+    window.addEventListener('popstate', function () { pjaxGo(location.href, false, location.hash); });
   }
 
   // 三横菜单的定位:顶线和音乐控件同一条(图标底 + 间隙),右边对齐图标组右缘
