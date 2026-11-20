@@ -340,6 +340,7 @@ body.home .footer__content a { color: rgba(46, 32, 24, .72); }
 }
 [data-theme="dark"] .pixtext { background-image: url('/img/pixtext-dark.svg'); }
 
+
 /* 点阵字里的闪动光标:与顶栏 .logo__cursor 同一套(颜色 #FE5186、1s、同一组 @keyframes cursor)
    位置按 SVG 里的百分比算 —— "Brew-Lab" 行右端 56.45%、行顶 32.78%、行高 21.03%,
    24px 嫌粗、12px 嫌细长,现定 16×28(比例 0.57,贴近顶栏 10:16);百分比缩放所以桌面/手机通用 */
@@ -588,12 +589,38 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
    所以给切换图标 order: -1 即可(汉堡是默认 0)
    ============================================================ */
 @media (min-width: 685px) {
-  .header__right .theme-toggle { order: -1; margin-right: 4px; margin-left: 0; }
+  /* 三个图标左→右:深浅切换 → 音符 → 汉堡(order 整数排序) */
+  .header__right .theme-toggle { order: 1; margin-right: 4px; margin-left: 0; }
+  .header__right .header-note  { order: 2; margin-right: 2px; margin-left: 0; }
+  .header__right .menu-trigger { order: 3; }
 }
 
 /* 汉堡图标按下的回弹 */
 .menu-trigger { transition: transform var(--dur-fast) ease-out; }
 .menu-trigger:active { transform: scale(.88); }
+
+/* 顶栏音符图标:尺寸/间距与深浅切换、汉堡保持一致(24×24) */
+.header__right .header-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: currentColor;
+  transition: transform var(--dur-fast) ease-out;
+}
+.header__right .header-note svg { display: block; width: 24px; height: 24px; fill: currentColor; }
+.header__right .header-note:active { transform: scale(.88); }
+
+/* 三个图标统一「光学高度 18px」(2026-11 他的要求:原先大小不一)
+   主题的深浅切换图形是 48 视框、墨迹只占 80.5%,24px 渲染出来高 19.33px,
+   比音符(墨迹 18)和三横(墨迹 18 宽)都大一圈 → 元素缩到 22.35px,
+   墨迹正好 18px;音符和三横本来就是 18,不用动。 */
+.header__right .theme-toggle svg { width: 22.35px; height: 22.35px; transform: translateY(0.67px); }
+.header__right .header-note svg { width: 24px; height: 24px; }
+.header__right .menu-trigger svg { width: 24px; height: 24px; }
 
 /* ============================================================
    深浅切换:新主题以圆形从图标中心向外扩散(View Transitions API)
@@ -619,8 +646,9 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
    ============================================================ */
 @media (max-width: 684px) {
   /* 切换图标排在汉堡左侧。.header__right 是 row-reverse,order 越小越靠右 */
-  .header__right .theme-toggle { order: 1; margin-right: 4px; margin-left: 0; transform: translateY(1px); }
-  .header__right .menu-trigger { margin-left: 4px; }
+  .header__right .theme-toggle { order: 2; margin-right: 4px; margin-left: 0; }
+  .header__right .header-note  { order: 1; margin-right: 2px; margin-left: 0; }
+  .header__right .menu-trigger { order: 0; margin-left: 4px; }
 }
 
 /* 尊重系统的"减弱动态效果" */
@@ -683,7 +711,7 @@ body.home .container {
 }
 
 body.home .container {
-  min-height: 100vh;             /* 撑满一屏 → 页脚永远贴屏幕底边 */
+  min-height: 100%;              /* 原来是 100vh:手机上是「大视口」高度,底部工具栏一展开就把版权行盖住,改 100% */
   display: flex;
   flex-direction: column;
 }
@@ -718,7 +746,7 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
   .logo__text { font-size: 20px; letter-spacing: 0.8px; }   /* 左上角 logo:字号 20px,字距 0.8px */
   .header .logo__mark svg { height: 22px; vertical-align: -4px; }
   .header__right .theme-toggle, .header__right .menu-trigger { width: 24px; height: 24px; }
-  .header__right .theme-toggle svg, .header__right .menu-trigger svg { width: 24px; height: 24px; }
+  .header__right .menu-trigger svg { width: 24px; height: 24px; }
   .header__right .theme-toggle { margin-right: 4px; }
   .header__right .menu-trigger { margin-left: 4px; }
   .hero__handle { font-size: 2.7em; }
@@ -742,20 +770,40 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
 
 /* ---------- 手机(<685px) ---------- */
 @media (max-width: 684px) {
-  body.home { --hero-art-h: 220px; }                      /* 碰杯图(他说的 logo)高度 */
+  /* 横排后主视觉要收小,否则左右两列在 390 宽里放不下 */
+  /* 横排后碰杯图不能太宽:高度取 min(130px, 36vw),保证左右两列 + 间距不超过屏宽 */
+  body.home { --hero-art-h: min(121px, 31vw); --hero-gap: 8px; --pixtext-w: 250px; }
+  /* 手机端不再锁死 body 高度:原来 height:100dvh + overflow:hidden,遇到不支持 dvh 的浏览器
+     (旧版 Chrome/Safari)会退回大视口高度,底部的页脚正好被工具栏/裁剪吃掉。
+     改成 min-height:100dvh,内容本来就一屏放得下,页脚永远在可视区内。 */
+  body.home { height: auto; min-height: 100vh; min-height: 100dvh; overflow: visible; }
+  body.home .container { height: auto; min-height: 100vh; min-height: 100dvh; }
   body.home .content-center { padding-top: 58px; justify-content: center; }   /* 手机:顶栏 58px 以下居中 */
-  .footer { padding-bottom: 6px; }        /* 同上,手机端 6px */
+  /* 手机端页脚:只留 iPhone 手势条的安全区,不再额外加呼吸位(2026-11 他要求整体下移 25px) */
+  .footer { padding-bottom: env(safe-area-inset-bottom, 0px); }
 
   /* 顶栏 logo 实测值(390 宽):文字 16px / 图案 22px / 图标 24px
      —— 主题默认文字是 18px,这里只收到 16px 并收紧字距;图案沿用全局 22px,手机端没有单独覆盖 */
   .logo__text { font-size: 16px; letter-spacing: 0.2px; }   /* 字号 18 → 16;字距收自主题的 0.96px */
   /* @Mix-Coffee 收到 30px(2.7em → 1.875em),让它比顶栏 logo 弱一档 */
-  .hero__handle { font-size: 1.875em; }
-  /* 手机:同一棵 DOM 竖排 —— 主视觉 → @Mix-Coffee → 社交图标 → 点阵字 */
-  body.home .hero-row { display: flex; flex-direction: column; align-items: center; width: 100%; }
-  body.home .hero-col { display: flex; flex-direction: column; align-items: center; }
-  body.home .hero-social { margin-top: 4px; }
-  body.home .pixtext { flex: 0 0 auto; width: 300px; max-width: 86vw; margin: 16px 0 12px; }
+  .hero__handle { font-size: 1.5em; }   /* 收窄两次:1.875 → 1.6 → 1.5em,这行字最宽,决定左列宽度 */
+  /* 手机:与桌面同构的横排 —— 左列(主视觉 + @Mix-Coffee + 社交图标)、右列点阵字 */
+  body.home .hero-row { display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center;
+                        justify-content: space-between; gap: var(--hero-gap); width: 100%; padding: 0 4px; }
+  body.home .hero-col { display: flex; flex-direction: column; align-items: center; flex: 0 0 auto; }
+  /* 手机端社交图标:16px,间距/上方留白按电脑端比例(间距 0.82×图标、上方 0.42×图标)缩放
+     电脑端:24px 图标 / 图标间距 19.7 / 上方 10px → 手机端:16 / 13 / 7 */
+  body.home .hero { margin-bottom: 4px; }
+  body.home .hero-social { display: flex; justify-content: center; align-items: center;
+                           margin-top: 2.7px; font-size: 0; }   /* 4 + 2.7 = 6.7 = 16 × 0.417(桌面 10/24) */
+  /* 图标之间原本是 &nbsp;,它自己也会变成一个 flex item,用 gap 会多出一段;
+     改成给链接加左右外边距:6.5 + 6.5 = 图标间距 13(电脑端 19.7/24 ≈ 0.82 的比例) */
+  .hero-social a { margin: 0 5.5px; }
+  .hero-social svg { width: 16px; height: 16px; }
+  /* 宽度 = min(设定值, 屏宽 - 左列实际宽 - 16),320 那种窄屏也不会和左边重叠 */
+  body.home .pixtext { flex: 0 0 auto; max-width: none; margin: 0;
+                       width: min(var(--pixtext-w),
+                                  calc(100vw - max(132px, var(--hero-art-h) * 1.1055) - 16px)); }
 }
 
 /* ---------- 矮屏兜底:一屏锁死的前提下,视口太矮就把主视觉再压小 ---------- */
@@ -765,6 +813,10 @@ body.home .hero__art > svg { display: block; width: 100%; height: 100%; }
 }
 @media (max-height: 560px) {
   body.home { --hero-art-h: 110px; }
+}
+/* 手机 + 矮屏:上面两条会把主视觉按视口高度放大,横排时会顶到屏边,这里按宽度封顶盖回去 */
+@media (max-width: 684px) and (max-height: 700px) {
+  body.home { --hero-art-h: min(114px, 31vw); }
 }
 
 /* ============================================================

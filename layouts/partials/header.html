@@ -1,0 +1,39 @@
+{{/* 站点覆盖版 header.html —— 内容与主题 layouts/partials/header.html 基本一致,
+     只在 .header__right 里多插了一个音符图标。
+
+     音符图形取自 Material Icons 的 music_note(Apache-2.0),与主题自带的
+     三横汉堡图标同源,粗细/圆角风格一致;fill 走 currentColor,自动跟随明暗。
+     三个图标的左右顺序不在这里决定,由 custom.css 的 order 规则排(桌面:
+     深浅切换 → 音符 → 汉堡;手机同样顺序)。
+
+     以后主题升级如果改了 header.html,要手动把改动合并进这个文件。 */}}
+<header class="header">
+    <span class="header__inner">
+        {{ partial "logo.html" . }}
+
+        <span class="header__right">
+            {{- if len .Site.Menus }}
+                {{ partial "menu.html" . }}
+            {{- end }}
+
+            <span class="header-note not-selectable" role="button" tabindex="0" aria-label="音乐">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+            </span>
+
+            {{- if len .Site.Menus }}
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M4 4.5h16v2H4zM4 11h16v2H4zM4 17.5h16v2H4z"/>
+                    </svg>
+                </span>
+            {{- end }}
+
+            {{- if .Site.Params.EnableThemeToggle }}
+                <span class="theme-toggle not-selectable">{{ partial "theme-toggle-icon.html" . }}</span>
+            {{- end}}
+        </span>
+    </span>
+</header>
