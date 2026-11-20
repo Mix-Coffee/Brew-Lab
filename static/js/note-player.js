@@ -508,7 +508,6 @@
     var u;
     try { u = new URL(a.href, location.href); } catch (e) { return false; }
     if (u.origin !== location.origin) return false;
-    if (u.pathname === location.pathname && u.search === location.search) return false;  // 同页(含锚点)
     return true;
   }
 
@@ -551,9 +550,21 @@
     document.addEventListener('click', function (e) {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       var a = e.target.closest ? e.target.closest('a') : null;
-      if (!isInternalLink(a)) return;
-      e.preventDefault();
-      pjaxGo(a.href, true, a.hash);
+        if (!isInternalLink(a)) return;
+        var u = new URL(a.href, location.href);
+        if (u.pathname === location.pathname && u.search === location.search) {
+          // 点的是当前这一页(比如在首页点左上角 logo):浏览器会整页重载把音乐打断,
+          // 这里改成不重载,只回顶部 / 滚到锚点
+          e.preventDefault();
+          if (u.hash) {
+            var t = document.getElementById(u.hash.slice(1));
+            if (t) { t.scrollIntoView(); return; }
+          }
+          window.scrollTo(0, 0);
+          return;
+        }
+        e.preventDefault();
+        pjaxGo(a.href, true, a.hash);
     });
     window.addEventListener('popstate', function () { pjaxGo(location.href, false, location.hash); });
   }
