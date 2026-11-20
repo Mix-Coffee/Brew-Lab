@@ -31,6 +31,18 @@
                 </span>
             {{- end }}
 
+            {{/* 后退 / 前进:图形是两条直角折线,线宽 2px,和汉堡同源 */}}
+            <span class="nav-arrow nav-back not-selectable" role="button" tabindex="0" aria-label="后退" title="后退">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M14.8 5 7.8 12l7 7"/>
+                </svg>
+            </span>
+            <span class="nav-arrow nav-fwd not-selectable" role="button" tabindex="0" aria-label="前进" title="前进">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M9.2 5l7 7-7 7"/>
+                </svg>
+            </span>
+
             {{- if .Site.Params.EnableThemeToggle }}
                 <span class="theme-toggle not-selectable">{{ partial "theme-toggle-icon.html" . }}</span>
             {{- end}}

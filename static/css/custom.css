@@ -596,6 +596,21 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
   .header__right .theme-toggle { order: 1; margin-right: 15px; margin-left: 0; }
   .header__right .header-note  { order: 2; margin-right: 13.5px; margin-left: 0; }
   .header__right .menu-trigger { order: 3; }
+
+/* 后退 / 前进:排在三横右边 */
+.header__right .nav-arrow {
+  display: block; width: 24px; height: 24px; cursor: pointer;
+  transition: opacity var(--dur-fast) ease-out, transform var(--dur-fast) ease-out;
+}
+.header__right .nav-arrow svg {
+  display: block; width: 24px; height: 24px; fill: none;
+  stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.header__right .nav-back { order: 4; margin-left: 13.5px; }
+.header__right .nav-fwd  { order: 5; margin-left: 16px; }
+.header__right .nav-arrow:active { transform: scale(.88); }
+.header__right .nav-arrow.is-off { opacity: .22; cursor: default; }
+.header__right .nav-arrow:not(.is-off):hover { opacity: .72; }
 }
 
 /* 汉堡图标按下的回弹 */
@@ -652,6 +667,9 @@ nav.menu .menu__inner > .submenu { animation: item-in var(--dur-base) var(--ease
   .header__right .theme-toggle { order: 2; margin-right: 15px; margin-left: 0; }
   .header__right .header-note  { order: 1; margin-right: 13.5px; margin-left: 0; }
   .header__right .menu-trigger { order: 0; margin-left: 4px; }
+  /* 手机上顶栏塞不下五个图标(390/360 都会顶出视口),先隐藏;
+     移动端本来就能用系统返回手势,照样走 popstate 局部切换 */
+  .header__right .nav-arrow { display: none; }
 }
 
 /* 尊重系统的"减弱动态效果" */

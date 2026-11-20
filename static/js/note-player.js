@@ -501,6 +501,29 @@
      这里拦住站内链接,fetch 新页面后只把 .container 里的内容换掉:
      header(菜单/主题切换的绑定)和 body 上的播放器都原地保留,
      音频元素没有被销毁,所以可以一直播。 */
+  var navIdx = (history.state && typeof history.state.idx === 'number') ? history.state.idx : 0;
+  var navMax = navIdx;   // 本次加载最多走到第几层,用来判断「前进」能不能点
+
+  function paintArrows() {
+    var b = document.querySelector('.nav-back'), f = document.querySelector('.nav-fwd');
+    if (b) b.classList.toggle('is-off', navIdx <= 0);
+    if (f) f.classList.toggle('is-off', navIdx >= navMax);
+  }
+
+  function wireArrows() {
+    var b = document.querySelector('.nav-back'), f = document.querySelector('.nav-fwd');
+    function act(el, can, run) {
+      if (!el) return;
+      el.addEventListener('click', function () { if (can()) run(); });
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (can()) run(); }
+      });
+    }
+    act(b, function () { return navIdx > 0; }, function () { history.back(); });
+    act(f, function () { return navIdx < navMax; }, function () { history.forward(); });
+    paintArrows();
+  }
+
   function isInternalLink(a) {
     if (!a || a.target === '_blank' || a.hasAttribute('download')) return false;
     var href = a.getAttribute('href');
@@ -535,7 +558,12 @@
         var doc = new DOMParser().parseFromString(html, 'text/html');
         if (!swapInto(doc)) throw new Error('no container');
         document.title = doc.title || document.title;
-        if (push) history.pushState({ pjax: 1 }, '', href);
+        if (push) {
+          navIdx++;
+          if (navIdx > navMax) navMax = navIdx;
+          history.pushState({ pjax: 1, idx: navIdx }, '', href);
+          paintArrows();
+        }
         if (hash) {
           var t = document.getElementById(hash.slice(1));
           if (t) { t.scrollIntoView(); return; }
@@ -566,7 +594,12 @@
         e.preventDefault();
         pjaxGo(a.href, true, a.hash);
     });
-    window.addEventListener('popstate', function () { pjaxGo(location.href, false, location.hash); });
+    window.addEventListener('popstate', function (e) {
+      navIdx = (e.state && typeof e.state.idx === 'number') ? e.state.idx : 0;
+      paintArrows();
+      pjaxGo(location.href, false, location.hash);
+    });
+    wireArrows();
   }
 
   // 三横菜单的定位:顶线和音乐控件同一条(图标底 + 间隙),右边对齐图标组右缘
